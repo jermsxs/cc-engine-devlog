@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Inter, sans-serif" font-size="14">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <line x1="40" y1="300" x2="680" y2="300" stroke="#cfcfcb" stroke-width="2"/>
+  <line x1="365" y1="300" x2="592" y2="300" stroke="#d8b67a" stroke-width="6"/>
+  <line x1="80" y1="80" x2="592" y2="300" stroke="#8d8d89" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <line x1="80" y1="80" x2="365" y2="300" stroke="#8d8d89" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <line x1="80" y1="80" x2="200" y2="300" stroke="#8d8d89" stroke-width="1"/>
+  <line x1="80" y1="80" x2="650" y2="300" stroke="#8d8d89" stroke-width="1"/>
+  <line x1="80" y1="80" x2="480" y2="300" stroke="#d8b67a" stroke-width="1.5"/>
+  <rect x="300" y="200" width="60" height="50" fill="#0b0b0b" stroke="#cfcfcb" stroke-width="2"/>
+  <circle cx="80" cy="80" r="9" fill="#d8b67a"/>
+  <circle cx="480" cy="300" r="5" fill="#d8b67a"/>
+  <line x1="330" y1="46" x2="330" y2="198" stroke="#8d8d89" stroke-width="1"/>
+  <text x="330" y="38" fill="#cfcfcb" text-anchor="middle">occluder</text>
+  <text x="80" y="56" fill="#cfcfcb" text-anchor="middle">light</text>
+  <text x="200" y="326" fill="#cfcfcb" text-anchor="middle">lit</text>
+  <text x="650" y="326" fill="#cfcfcb" text-anchor="middle">lit</text>
+  <text x="480" y="326" fill="#d8b67a" text-anchor="middle">shadow</text>
+  <text x="496" y="222" fill="#d8b67a">anything nearer the light?</text>
+  <text x="360" y="352" fill="#8d8d89" text-anchor="middle">the map stores the first thing each ray from the light hits</text>
+</svg>
