@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c8c8c8"/></marker>
+    <marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d9c591"/></marker>
+  </defs>
+  <polyline points="100,276 126,284 152,276 178,284 204,276 230,284 256,276 282,284 308,276 334,284 360,276 386,284 412,276 438,284 464,276 490,284 516,276 542,284 568,276 594,284 620,276" fill="none" stroke="#8a8a84" stroke-width="2"/>
+  <line x1="337.4" y1="288.2" x2="382.6" y2="271.8" stroke="#d9c591" stroke-width="5" stroke-linecap="round"/>
+  <line x1="360" y1="280" x2="360" y2="92" stroke="#c8c8c8" stroke-width="2" marker-end="url(#ah)"/>
+  <line x1="360" y1="280" x2="206" y2="172" stroke="#c8c8c8" stroke-width="2" marker-end="url(#ah)"/>
+  <line x1="360" y1="280" x2="408" y2="98" stroke="#c8c8c8" stroke-width="2" marker-end="url(#ah)"/>
+  <line x1="360" y1="280" x2="310" y2="141" stroke="#d9c591" stroke-width="2" marker-end="url(#aa)"/>
+  <text x="368" y="92" fill="#c8c8c8" font-style="italic" font-size="18">n</text>
+  <text x="196" y="172" fill="#c8c8c8" font-style="italic" font-size="18" text-anchor="end">l</text>
+  <text x="418" y="100" fill="#c8c8c8" font-style="italic" font-size="18">v</text>
+  <text x="300" y="138" fill="#d9c591" font-style="italic" font-size="18" text-anchor="end">h</text>
+  <text x="620" y="306" fill="#8a8a84" text-anchor="end" font-size="14">microscopic facets</text>
+  <text x="40" y="332" fill="#c8c8c8" font-size="14">n surface normal, l direction to the light, v direction to the eye, h half vector between l and v.</text>
+  <text x="40" y="352" fill="#d9c591" font-size="14">Only facets whose own normal is h (highlighted) reflect light from l toward v.</text>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <text x="60" y="30" fill="#c8c8c8">A cascade shadow tile as the camera walks</text>
+  <line x1="80" y1="320" x2="680" y2="320" stroke="#8a8a84" stroke-width="1.5"/>
+  <polygon points="680,320 670,315 670,325" fill="#8a8a84"/>
+  <text x="680" y="346" text-anchor="end" fill="#8a8a84">camera position along the path</text>
+  <line x1="80" y1="320" x2="80" y2="50" stroke="#8a8a84" stroke-width="1.5"/>
+  <polygon points="80,50 75,60 85,60" fill="#8a8a84"/>
+  <text x="96" y="62" fill="#8a8a84">tile origin</text>
+  <line x1="80" y1="300" x2="660" y2="80" stroke="#8a8a84" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <polyline points="80.0,300.0 116.2,300.0 116.2,272.5 188.8,272.5 188.8,245.0 261.2,245.0 261.2,217.5 333.8,217.5 333.8,190.0 406.2,190.0 406.2,162.5 478.8,162.5 478.8,135.0 551.2,135.0 551.2,107.5 623.8,107.5 623.8,80.0 660.0,80.0" fill="none" stroke="#d9c591" stroke-width="2.5"/>
+  <text x="680" y="262" text-anchor="end" fill="#8a8a84">follows the camera: redrawn every frame</text>
+  <text x="100" y="120" fill="#d9c591">moves in whole steps: redrawn only at a step</text>
+</svg>

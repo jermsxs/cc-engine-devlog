@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" role="img" aria-label="Top-down view of a camera frustum cut into tiles and depth slices that grow thicker with distance, with a light whose range overlaps three cells">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <g fill="#d9c591" fill-opacity="0.22">
+    <polygon points="316.3,148 452.1,131 452.1,180 316.3,180"/>
+    <polygon points="316.3,180 452.1,180 452.1,229 316.3,212"/>
+    <polygon points="316.3,212 452.1,229 452.1,278 316.3,244.1"/>
+  </g>
+  <g stroke="#8a8a84" stroke-width="1" fill="none">
+    <line x1="60" y1="180" x2="660" y2="30"/>
+    <line x1="60" y1="180" x2="660" y2="330"/>
+    <line x1="60" y1="180" x2="660" y2="105"/>
+    <line x1="60" y1="180" x2="660" y2="180"/>
+    <line x1="60" y1="180" x2="660" y2="255"/>
+    <line x1="80" y1="175" x2="80" y2="185"/>
+    <line x1="90.6" y1="172.3" x2="90.6" y2="187.7"/>
+    <line x1="106.8" y1="168.3" x2="106.8" y2="191.7"/>
+    <line x1="131.6" y1="162.1" x2="131.6" y2="197.9"/>
+    <line x1="169.5" y1="152.6" x2="169.5" y2="207.4"/>
+    <line x1="227.5" y1="138.1" x2="227.5" y2="221.9"/>
+    <line x1="316.3" y1="116" x2="316.3" y2="244.1"/>
+    <line x1="452.1" y1="82" x2="452.1" y2="278"/>
+    <line x1="660" y1="30" x2="660" y2="330"/>
+  </g>
+  <circle cx="400" cy="200" r="40" fill="none" stroke="#d9c591" stroke-width="2" stroke-dasharray="5 4"/>
+  <circle cx="400" cy="200" r="4" fill="#d9c591"/>
+  <circle cx="60" cy="180" r="5" fill="#c8c8c8"/>
+  <g font-family="Georgia, serif" font-size="14" fill="#c8c8c8">
+    <text x="60" y="206" text-anchor="middle">camera</text>
+    <text x="200" y="104">thin slices near the camera</text>
+    <text x="520" y="62" fill="#8a8a84">thick slices far away</text>
+    <text x="400" y="300" text-anchor="middle" fill="#d9c591">light range</text>
+    <text x="360" y="346" text-anchor="middle" fill="#8a8a84">Top view, 8 slices and 4 tiles for clarity. The engine uses 24 slices and 24 tiles across.</text>
+  </g>
+</svg>

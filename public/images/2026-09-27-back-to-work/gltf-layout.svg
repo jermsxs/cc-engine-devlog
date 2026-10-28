@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15" role="img">
+<title>How a glTF file points from a mesh to raw vertex bytes</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a8a84"/></marker></defs>
+<rect width="720" height="360" fill="#0b0b0b"/>
+<text x="360" y="44" text-anchor="middle" fill="#c8c8c8">From a mesh to bytes</text>
+<g fill="none" stroke="#c8c8c8" stroke-width="1.5">
+<rect x="20" y="90" width="150" height="110" rx="6"/>
+<rect x="210" y="90" width="150" height="110" rx="6"/>
+<rect x="400" y="90" width="150" height="110" rx="6"/>
+<rect x="590" y="90" width="110" height="110" rx="6" stroke="#d9c591"/>
+</g>
+<g fill="#c8c8c8" text-anchor="middle">
+<text x="95" y="118">Mesh primitive</text><text x="285" y="118">Accessor</text><text x="475" y="118">Buffer view</text><text x="645" y="118" fill="#d9c591">Buffer</text>
+</g>
+<g fill="#8a8a84" text-anchor="middle" font-size="14">
+<text x="95" y="146">POSITION = 3</text><text x="95" y="166">NORMAL = 4</text><text x="95" y="186">material = 1</text>
+<text x="285" y="146">VEC3, float</text><text x="285" y="166">count = 1,024</text><text x="285" y="186">bufferView = 2</text>
+<text x="475" y="146">byteOffset</text><text x="475" y="166">byteLength</text><text x="475" y="186">byteStride</text>
+<text x="645" y="146">raw bytes</text><text x="645" y="166">in a .bin</text><text x="645" y="186">or GLB chunk</text>
+</g>
+<g stroke="#8a8a84" stroke-width="1.5" fill="none" marker-end="url(#a)">
+<line x1="170" y1="145" x2="208" y2="145"/><line x1="360" y1="145" x2="398" y2="145"/><line x1="550" y1="145" x2="588" y2="145"/>
+</g>
+<text x="360" y="250" text-anchor="middle" fill="#8a8a84" font-size="14">the JSON part holds only indices and sizes; all vertex data sits in the binary buffer</text>
+<text x="360" y="275" text-anchor="middle" fill="#8a8a84" font-size="14">the numbers in the boxes are examples</text>
+</svg>

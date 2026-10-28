@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="Georgia, serif" font-size="15">
+<rect width="720" height="360" fill="#0b0b0b"/>
+<rect x="60" y="60" width="600" height="240" fill="none" stroke="#c8c8c8" stroke-width="2"/>
+<line x1="250" y1="180" x2="190" y2="60" stroke="#8a8a84" stroke-width="1.5" stroke-dasharray="6 5"/>
+<line x1="250" y1="180" x2="400" y2="60" stroke="#d9c591" stroke-width="1.5" stroke-dasharray="6 5"/>
+<line x1="520" y1="300" x2="400" y2="60" stroke="#d9c591" stroke-width="2"/>
+<circle cx="250" cy="180" r="6" fill="#d9c591"/>
+<circle cx="520" cy="300" r="5" fill="#c8c8c8"/>
+<circle cx="400" cy="60" r="5" fill="#d9c591"/>
+<circle cx="190" cy="60" r="4" fill="#8a8a84"/>
+<text x="262" y="196" fill="#c8c8c8">C: capture point</text>
+<text x="520" y="322" fill="#c8c8c8" text-anchor="middle">P: shaded floor point</text>
+<text x="400" y="48" fill="#d9c591" text-anchor="middle">H: where the reflected ray meets the box</text>
+<text x="190" y="82" fill="#8a8a84" text-anchor="middle">naive hit</text>
+<text x="495" y="222" fill="#c8c8c8">reflected ray from P</text>
+<text x="70" y="118" fill="#8a8a84">no correction</text>
+<text x="360" y="348" fill="#c8c8c8" text-anchor="middle">Box projection: read the cube map in the direction from C to H.</text>
+</svg>

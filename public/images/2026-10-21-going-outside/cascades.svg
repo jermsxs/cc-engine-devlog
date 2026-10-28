@@ -1,18 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Inter, sans-serif" font-size="15">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15">
   <rect width="720" height="360" fill="#0b0b0b"/>
-  <text x="360" y="28" text-anchor="middle" fill="#cfcfcb">Looking down on the camera's view, cut into four slices</text>
-  <polygon points="60,180 680,60 680,300" fill="none" stroke="#8d8d89" stroke-width="1.5"/>
-  <line x1="160" y1="160.6" x2="160" y2="199.4" stroke="#d8b67a" stroke-width="2"/>
-  <line x1="250" y1="143.2" x2="250" y2="216.8" stroke="#d8b67a" stroke-width="2"/>
-  <line x1="400" y1="114.2" x2="400" y2="245.8" stroke="#d8b67a" stroke-width="2"/>
-  <circle cx="60" cy="180" r="5" fill="#cfcfcb"/>
-  <text x="60" y="212" text-anchor="middle" fill="#cfcfcb">camera</text>
-  <text x="110" y="185" text-anchor="middle" fill="#cfcfcb">1</text>
-  <text x="205" y="185" text-anchor="middle" fill="#cfcfcb">2</text>
-  <text x="325" y="185" text-anchor="middle" fill="#cfcfcb">3</text>
-  <text x="540" y="185" text-anchor="middle" fill="#cfcfcb">4</text>
-  <line x1="60" y1="322" x2="680" y2="322" stroke="#8d8d89" stroke-width="1.5"/>
-  <polygon points="680,322 670,317 670,327" fill="#8d8d89"/>
-  <text x="60" y="348" fill="#8d8d89">fine shadow detail</text>
-  <text x="680" y="348" text-anchor="end" fill="#8d8d89">coarser, but far away</text>
+  <text x="360" y="30" text-anchor="middle" fill="#c8c8c8">The camera view from above, cut into four slices</text>
+  <polygon points="60,180 680,60 680,300" fill="none" stroke="#8a8a84" stroke-width="1.5"/>
+  <line x1="160" y1="160.6" x2="160" y2="199.4" stroke="#d9c591" stroke-width="2"/>
+  <line x1="250" y1="143.2" x2="250" y2="216.8" stroke="#d9c591" stroke-width="2"/>
+  <line x1="400" y1="114.2" x2="400" y2="245.8" stroke="#d9c591" stroke-width="2"/>
+  <circle cx="60" cy="180" r="5" fill="#c8c8c8"/>
+  <text x="60" y="212" text-anchor="middle" fill="#c8c8c8">camera</text>
+  <text x="110" y="185" text-anchor="middle" fill="#c8c8c8">1</text>
+  <text x="205" y="185" text-anchor="middle" fill="#c8c8c8">2</text>
+  <text x="325" y="185" text-anchor="middle" fill="#c8c8c8">3</text>
+  <text x="540" y="185" text-anchor="middle" fill="#c8c8c8">4</text>
+  <text x="360" y="62" text-anchor="middle" fill="#8a8a84">one shadow map per slice (slice sizes not to scale)</text>
+  <line x1="60" y1="322" x2="680" y2="322" stroke="#8a8a84" stroke-width="1.5"/>
+  <polygon points="680,322 670,317 670,327" fill="#8a8a84"/>
+  <text x="60" y="348" fill="#8a8a84">fine texels</text>
+  <text x="680" y="348" text-anchor="end" fill="#8a8a84">coarse texels, far away</text>
 </svg>

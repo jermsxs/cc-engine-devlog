@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <text x="60" y="30" fill="#c8c8c8">Cross-section of two neighbouring triangles</text>
+  <polygon points="60,250 300,218 300,263 60,295" fill="none" stroke="#8a8a84" stroke-width="1.5"/>
+  <polygon points="300,218 540,236 540,281 300,263" fill="none" stroke="#8a8a84" stroke-width="1.5"/>
+  <polyline points="60,250 300,218 540,236" fill="none" stroke="#d9c591" stroke-width="3"/>
+  <line x1="300" y1="218" x2="300" y2="263" stroke="#d9c591" stroke-width="2" stroke-dasharray="5 4"/>
+  <circle cx="266.8" cy="198.2" r="24" fill="none" stroke="#c8c8c8" stroke-width="1.5"/>
+  <circle cx="270" cy="222" r="3.5" fill="#c8c8c8"/>
+  <line x1="150" y1="138" x2="268" y2="220" stroke="#8a8a84" stroke-width="1"/>
+  <text x="60" y="130" fill="#c8c8c8">face contact: kept, takes the face normal</text>
+  <line x1="300" y1="267" x2="300" y2="304" stroke="#8a8a84" stroke-width="1"/>
+  <text x="300" y="324" text-anchor="middle" fill="#c8c8c8">seam between wedges: side contacts dropped</text>
+  <line x1="558" y1="236" x2="558" y2="281" stroke="#8a8a84" stroke-width="1.5"/>
+  <line x1="552" y1="236" x2="564" y2="236" stroke="#8a8a84" stroke-width="1.5"/>
+  <line x1="552" y1="281" x2="564" y2="281" stroke="#8a8a84" stroke-width="1.5"/>
+  <text x="572" y="263" fill="#8a8a84">0.25 m</text>
+</svg>

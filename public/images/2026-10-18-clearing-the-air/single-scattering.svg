@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="Georgia, serif" font-size="14">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <line x1="330" y1="70" x2="150" y2="190" stroke="#8a8a84" stroke-width="1.5" stroke-dasharray="5 5"/>
+  <line x1="330" y1="70" x2="270" y2="190" stroke="#8a8a84" stroke-width="1.5" stroke-dasharray="5 5"/>
+  <line x1="330" y1="70" x2="390" y2="190" stroke="#8a8a84" stroke-width="1.5" stroke-dasharray="5 5"/>
+  <line x1="330" y1="70" x2="510" y2="190" stroke="#8a8a84" stroke-width="1.5" stroke-dasharray="5 5"/>
+  <line x1="77" y1="190" x2="610" y2="190" stroke="#c8c8c8" stroke-width="2"/>
+  <line x1="610" y1="90" x2="610" y2="260" stroke="#8a8a84" stroke-width="4"/>
+  <circle cx="70" cy="190" r="7" fill="none" stroke="#c8c8c8" stroke-width="2"/>
+  <circle cx="330" cy="70" r="8" fill="#d9c591"/>
+  <circle cx="150" cy="190" r="5" fill="#d9c591"/>
+  <circle cx="270" cy="190" r="5" fill="#d9c591"/>
+  <circle cx="390" cy="190" r="5" fill="#d9c591"/>
+  <circle cx="510" cy="190" r="5" fill="#d9c591"/>
+  <text x="330" y="46" text-anchor="middle" fill="#c8c8c8">Lamp</text>
+  <text x="70" y="222" text-anchor="middle" fill="#c8c8c8">Eye</text>
+  <text x="610" y="282" text-anchor="middle" fill="#c8c8c8">Surface</text>
+  <text x="330" y="230" text-anchor="middle" fill="#c8c8c8">Samples along the view ray</text>
+  <text x="360" y="312" text-anchor="middle" fill="#8a8a84">Each sample adds the lamp's light times the phase function</text>
+  <text x="360" y="334" text-anchor="middle" fill="#8a8a84">and times the fog's transmittance back to the eye.</text>
+</svg>

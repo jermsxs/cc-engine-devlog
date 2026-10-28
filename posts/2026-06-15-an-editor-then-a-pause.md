@@ -1,64 +1,91 @@
 ---
-title: An editor, then a pause
+title: An immediate-mode editor with undo, and the pause in June
 date: 2026-06-15
 order: 1
-summary: I wrote my own editor on an immediate-mode UI, with undo, gizmos and a profiler, then stopped on 15 June in the middle of a reskin.
+summary: I built the first editor on my own immediate-mode UI library, with gizmos and command-based undo, and stopped on 15 June in the middle of a restyle.
 tags: editor, tools
 cover: /images/2026-06-15-an-editor-then-a-pause/editor-june.jpg
 ---
 
-With the hallway stored as an entity scene, the obvious next question was how to change it. Editing JSON by hand works for about a day. Between 10 and 15 June I built an editor: a second program that shares the engine's renderer and lets you select things, move them, tweak them and undo it all. Then, on 15 June, I stopped. This post is about the editor, and about the stop.
+With the hallway stored as an entity scene, I needed a way to change it that was faster than editing JSON by hand. Between 10 and 15 June I built an editor: a second executable that shares the engine's renderer and lets me select entities, move them, change their components and undo the changes. The work is in two commits. The first, `45dfe71` on 10 June, added 63 files and about 11,800 lines. The second, `10af3c2` on 15 June, touched 43 files and added about 5,800 lines. It was the last commit before a three-month pause.
 
-![The editor in June: a dark hallway viewport between an outliner on the left and an inspector on the right](/images/2026-06-15-an-editor-then-a-pause/editor-june.jpg "The editor as it was on the last day of June work. The reskin was half done: text-only buttons, bracketed tags, and a stray graphics-driver popup in the corner.")
+![The June editor with an outliner on the left, the corridor in the centre, an inspector on the right and tabs for Assets, Console, Validate, Profile and Mats at the bottom](/images/2026-06-15-an-editor-then-a-pause/editor-june.jpg "The editor on the last day of June work. The toolbar is a row of abbreviations (MOV, ROT, SCL, TOP, CMD). The notice at the upper right is an overlay message from the NVIDIA software on my machine and is not part of the editor.")
 
-## Why my own UI library
+## Why I wrote my own UI library
 
-An editor needs buttons, sliders, text boxes, tree views and scrolling lists. The usual answer is to download a UI library. My rule is no third-party code, so the editor has its own UI library, about 600 lines to begin with. It is not a toy, though, and it taught me a different way to think about interfaces.
+An editor needs buttons, sliders, text fields, tree views and scrolling lists. The usual choice is a third-party UI library. I do not vendor third-party code in this project, so the editor uses a UI library of my own. It started at about 600 lines in `Engine/UI/UI.cpp` and a 167-line header.
 
-> **Concept: Immediate-mode UI.** There are two ways to build a user interface. In a *retained-mode* UI (the way most desktop apps work) you create a button object once, keep it, and change it when things happen: you register a click handler and update the object. In an *immediate-mode* UI there are no button objects. Every frame, your code just says `if (Button("Save")) { Save(); }`. The call draws the button at the current position, checks whether the mouse is over it and was clicked this frame, and returns true or false. When the frame is over, everything is forgotten and the next frame asks again.
+The design question was whether to keep UI objects between frames or not.
 
-![Two columns: retained mode creates and keeps objects, immediate mode asks for each widget every frame](/images/2026-06-15-an-editor-then-a-pause/immediate-vs-retained.svg "Same button, two philosophies.")
+> **Background: retained-mode and immediate-mode UI**
+>
+> In a retained-mode UI, which is how most desktop toolkits work, the program creates a widget object once and the toolkit stores it in a tree. The program changes the object when its data changes and registers a callback to hear about clicks. The toolkit owns the widgets, lays them out and redraws them when needed. This works well for applications with fixed forms, but the application has to keep the widgets and its own data in step. A slider that shows the exposure holds a copy of the exposure, and a change from another source has to be pushed into the slider.
+>
+> In an immediate-mode UI there are no stored widget objects. In each frame, the code that wants a button calls a function:
+>
+> ```cpp
+> if (ui.Button(L"Save")) { SaveScene(); }
+> ```
+>
+> The call reserves a rectangle, finds out whether the mouse is over it and was released over it in this frame, records how to draw it, and returns true or false. At the end of the frame the library discards everything. The next frame asks again. The UI can never disagree with the data, because the slider reads the real exposure value in every frame. The cost is that all of the UI code runs every frame, so long lists need care.
 
-The appeal is that the UI can never be out of sync with the data. The slider is not holding a copy of the exposure value, it is reading the real one this frame. The cost is that you redo the work each frame, so you have to be careful with long lists.
+![Two columns comparing retained mode, where widget objects live in a tree, with immediate mode, where a function call per frame draws and tests each widget](/images/2026-06-15-an-editor-then-a-pause/immediate-vs-retained.svg "The same button in both models. Retained mode stores state in the widget. Immediate mode stores it in the application.")
 
-In practice my UI context takes the mouse and keyboard state at the start of a frame, and each widget call (`Button`, `Checkbox`, `SliderFloat`, `DragFloat3`, `TextInput`, `TreeNode`, `Selectable`, `ColorEdit3`) does three things: it reserves a rectangle by moving a layout cursor down the panel, works out whether the mouse is interacting with it, and records what to draw. The drawing is not done on the spot. It is appended to a list of simple draw commands: a rectangle, a line, a piece of text, an image, "start clipping here", "stop clipping". At the end of the frame, one small shader draws the whole list over the 3D view, using a font stored in a texture.
+### How my context works
 
-Two details were worth the effort. Every widget gets an *ID* made by hashing its label, which is how the library knows "this is the same slider as last frame" without keeping objects. And long lists, such as the outliner with a hundred entities in it, use a *virtual list*: it works out which rows are actually visible and only builds those, so a thousand entities cost about the same as a screenful.
+The central class is `UI::Context`. At the start of a frame I give it the mouse and keyboard state and the window size. The application then calls widget functions: `Button`, `Checkbox`, `SliderFloat`, `DragFloat3`, `TextInput`, `TreeNode`, `Selectable` and `ColorEdit3`, plus layout calls such as `BeginPanel`, `Row` and `BeginHorizontal`. Each widget does three things.
+
+1. **It reserves a rectangle.** A layout cursor moves down the current panel by the row height. A panel keeps its own cursor, content width and scroll offset.
+2. **It identifies itself and tests the mouse.** The widget needs an identity so that the library can remember that "this slider is being dragged" from one frame to the next without keeping an object. The identity is a 64-bit FNV-style hash of the label, chained with a seed that changes after every widget. Two widgets with the same label therefore get different identifiers as long as their order is the same each frame, and the seed is reset at the start of every frame. A click is a mouse press that made the widget active, followed by a release while the mouse is still over it.
+3. **It records draw commands.** The commands are plain structs: rectangle, line, text, image, push clip and pop clip. Nothing is drawn yet.
+
+At the end of the frame the renderer converts the list of commands to triangles on the CPU. Clipping to scroll areas happens in that conversion, so a panel that is scrolled does not draw rows outside its bounds. The vertices go into one buffer per frame in flight, and the whole UI is a single draw call with a small shader. The buffer holds at most 65,536 vertices, and primitives beyond that are dropped. The font is an atlas of 256 glyphs in a 16 by 16 grid of 24 by 24 pixel cells, rasterised from Arial with GDI at startup.
+
+### Long lists
+
+Immediate mode means that an outliner with a thousand entities would build a thousand rows in every frame. Most of those rows are outside the visible area. I wrote a function for this, `CalculateVirtualListRange`. It takes the item count, the row height, the scroll offset and the height of the viewport. It returns the first and last row to build, with a margin of four rows on both sides, and the heights of the two empty spacers that stand in for the rows above and below. For 1,000 entities in a 400-pixel panel with 22-pixel rows, it builds 29 rows. The cost of the list depends on the size of the viewport and not on the size of the scene.
+
+### What the first version got wrong
+
+The input state held one typed character per frame. Fast typing lost letters, and a typed letter could also fire a keyboard shortcut. I did not fix that in June. It is part of the usability work in the last post of this series.
 
 ## What the editor could do
 
-The first big commit was about 12,000 lines. The second, five days later, added about 6,000 more. Together they gave me:
+The screenshot shows the layout. From the code and the screenshot, the editor had:
 
-- **Outliner.** A tree of everything in the scene, with search, and buttons to add, copy, delete and reparent entities.
-- **Inspector.** For the selected entity, one section per component, with sliders and fields you can edit: transform, mesh and material, light, camera, door, trigger.
-- **Gizmos.** Move, rotate and scale handles in the 3D view, and viewport camera modes (perspective, top, front, side), plus a "focus" command.
-- **Undo and redo.** More on this in a moment.
-- **Asset browser.** It scans the game's asset folders, lists textures and models, validates them, and re-imports them when they change on disk.
-- **Command palette.** One searchable list of every command.
-- **Console, validator and profiler.** The log, a set of checks that tell you what is wrong with the scene, and a panel with frame timings.
-- **Save, load, and play.** Open the hallway from a file, change it, save it, or press Play to try it.
+- **A scene hierarchy** with search and buttons for add, copy, delete and reparent. In the screenshot it lists the loop's trim runs and lamp instances.
+- **An inspector** with one section per component of the selected entity, and sliders for position, rotation, scale, material response and similar values.
+- **Viewport tools.** Move, rotate and scale gizmos, local or world space, a grid, snapping, and camera modes for perspective, top, front and side views.
+- **Undo and redo**, described below.
+- **A command palette** and a toolbar, the row of abbreviations at the top of the screenshot.
+- **Bottom tabs** for the asset browser, the console, a validation panel, performance statistics and materials. The validation panel checks the scene and reports what is wrong with it.
+- **Scene saving and loading**, so that a change in the editor becomes a file.
 
-All of that is about 40 files of editor code. A lot of it is plumbing, such as keeping preferences and project settings, but the plumbing is what makes it feel like a tool.
+Behind this sits a large amount of tested code. The test file for the editor's diagnostics and models grew to about 1,500 lines in the first commit and by roughly another 1,200 in the second, and the UI library has its own tests. Most of the editor's behaviour is testable without opening a window, because the models for selection, scene files, validation and command history are separate from the drawing code.
 
-## Undo is a data problem
+## Undo as stored commands
 
-Undo sounds simple until you try it. The way I did it: every edit is stored as a *command* that holds a copy of the component **before** and **after** the change. Undo writes back the "before" copy, redo writes the "after" copy. Dragging a slider produces dozens of changes, so consecutive edits to the same field are merged into one step, otherwise you would press Ctrl+Z forty times to take back a single drag.
+Undo needs to restore the scene exactly. I used the command pattern: each edit is stored as an object that knows how to apply and how to reverse itself.
 
-This worked, but it was heavy: each kind of component had its own command type with its own pair of copies. It was fine for a dozen components. It is also exactly the kind of thing that, three months later, I would replace.
+> **Background: undo with before and after snapshots**
+>
+> One way to build undo is to write an inverse operation for every operation: "move by +1" is undone by "move by -1". It is easy to get wrong when an edit has side effects. A more robust way is to record state. When a field is edited, the command stores the component as it was before the edit and as it is after. Undo writes the "before" copy back, and redo writes the "after" copy.
+>
+> Two rules make the history usable. First, a drag produces many small edits, one per frame. Pressing Ctrl+Z forty times to undo one drag would be unusable, so consecutive edits of the same thing are merged. Second, when a new edit is made after an undo, the redo history no longer applies and is cleared.
 
-## The reskin, and the stop
+In my `EditorCommandHistory`, a command carries an entity identifier, a kind, a label, and a before and after copy of the relevant component. Pushing a command first checks whether it can merge with the previous one. That is allowed when the entity, the kind and the label are all the same. The merged command keeps the original "before" and takes the new "after". If the result is a no-op, with before equal to after, the entry is removed. Every push clears the redo stack. Creating or deleting an entity, or a whole subtree of children, stores an `EntitySnapshot` of the affected entities, so that undo can bring them back with their identifiers.
 
-The screenshot at the top shows where the work ended. The editor was in the middle of a dark restyle: a command bar across the top, tabs at the bottom, the panels full height. The old look was functional and ugly, and I wanted a dark theme that matched the engine.
+This worked, but it did not scale well. The command struct had nineteen kinds and a before and after field for each component type. Every new component meant new fields, a new case in the merge check and a new case in the apply code. In September I replaced it with one generic whole-entity snapshot, which I describe in the last post of this series, in the section on the editor core.
 
-On 15 June there was a last commit, called "editor work", and then the history goes quiet. The next commit is dated 27 September.
+## The pause
 
-I want to be straightforward about that. The engine paused for about three and a half months. My notes do not give a reason, and there was no clean ending: a half-finished reskin, a working editor with rough edges, and a renderer full of hallway-specific tricks. What I had at that point:
+On 15 June I committed "editor work", and the history has no commit after it until 27 September. The commit was in the middle of a restyle. The screenshot shows it: buttons labelled with abbreviations, a tab strip at the bottom, panels that overlap, and a layout that was not finished. I did not write down why I stopped, so I will not give a reason here.
 
-- a DirectX 12 renderer with a shadow map and post effects;
-- an entity scene saved as JSON;
+At that point the project had:
+
+- a DirectX 12 renderer with an HDR target, one shadow map and a post-process pass;
+- an entity scene with 14 component types, saved as JSON;
 - a glTF importer for static meshes;
 - an editor that mostly worked.
 
-What I did not have was anything that looked like the reference. The lighting was a pile of shader tricks, there were no props, and nothing in the game could be touched.
-
-The next entry is the restart. When I came back, the first job was the unglamorous one: finish the reskin I had left half done.
+It did not have the look I was after. The lighting depended on shader code written for one corridor, the hallway had no authored props, and the player was kept inside hard-coded corridor bounds instead of colliding with real geometry. The next post covers the restart on 27 September, which began by finishing this reskin.

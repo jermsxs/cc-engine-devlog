@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="Georgia, serif" font-size="15">
+<rect width="720" height="360" fill="#0b0b0b"/>
+<text x="60" y="52" fill="#c8c8c8">decal faces +Z, out of the wall</text>
+<rect x="240" y="100" width="240" height="200" fill="none" stroke="#d9c591" stroke-width="2"/>
+<rect x="240" y="100" width="240" height="30" fill="#d9c591" fill-opacity="0.15"/>
+<rect x="240" y="270" width="240" height="30" fill="#d9c591" fill-opacity="0.15"/>
+<line x1="60" y1="200" x2="660" y2="200" stroke="#8a8a84" stroke-width="6"/>
+<line x1="240" y1="200" x2="480" y2="200" stroke="#d9c591" stroke-width="6"/>
+<line x1="300" y1="112" x2="300" y2="190" stroke="#c8c8c8" stroke-width="1.5"/>
+<polygon points="300,194 295,184 305,184" fill="#c8c8c8"/>
+<line x1="360" y1="112" x2="360" y2="190" stroke="#c8c8c8" stroke-width="1.5"/>
+<polygon points="360,194 355,184 365,184" fill="#c8c8c8"/>
+<line x1="420" y1="112" x2="420" y2="190" stroke="#c8c8c8" stroke-width="1.5"/>
+<polygon points="420,194 415,184 425,184" fill="#c8c8c8"/>
+<text x="492" y="118" fill="#c8c8c8">decal box</text>
+<text x="492" y="146" fill="#8a8a84">fades near front, back</text>
+<text x="492" y="228" fill="#d9c591">wall pixels inside</text>
+<text x="492" y="248" fill="#d9c591">the box are painted</text>
+<text x="360" y="340" fill="#c8c8c8" text-anchor="middle">Side view of a projected decal: the box selects which surface pixels it paints.</text>
+</svg>

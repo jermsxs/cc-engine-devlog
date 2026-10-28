@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="Georgia, serif" font-size="14">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <rect x="300" y="55" width="60" height="265" fill="#1a1a1a" stroke="#8a8a84" stroke-width="1.5"/>
+  <text x="330" y="44" text-anchor="middle" fill="#c8c8c8">Wall, 7 cm</text>
+  <text x="150" y="44" text-anchor="middle" fill="#c8c8c8">Corridor</text>
+  <text x="520" y="44" text-anchor="middle" fill="#c8c8c8">Parlor</text>
+  <circle cx="200" cy="95" r="6" fill="#d9c591"/>
+  <text x="214" y="100" fill="#c8c8c8">Lamp</text>
+  <text x="40" y="132" fill="#8a8a84">Before: 15 cm fade</text>
+  <polyline points="40,150 300,150 429,190 680,190" fill="none" stroke="#d9c591" stroke-width="2"/>
+  <text x="375" y="140" fill="#c8c8c8">About half reaches the parlor face</text>
+  <text x="40" y="232" fill="#8a8a84">After: 4 cm fade</text>
+  <polyline points="40,250 300,250 334,290 680,290" fill="none" stroke="#c8c8c8" stroke-width="2"/>
+  <text x="375" y="240" fill="#c8c8c8">Nothing reaches the parlor face</text>
+  <text x="360" y="346" text-anchor="middle" fill="#8a8a84">Line height is the light factor: high is full light, low is none.</text>
+</svg>

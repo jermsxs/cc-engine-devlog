@@ -1,28 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Inter, sans-serif" font-size="15">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15">
   <rect width="720" height="360" fill="#0b0b0b"/>
-  <text x="60" y="30" fill="#cfcfcb">One exposure for the whole frame</text>
-  <text x="660" y="30" text-anchor="end" fill="#8d8d89">brighter, to the right</text>
-  <text x="460" y="68" text-anchor="middle" fill="#8d8d89">what the screen can show</text>
-  <rect x="260" y="78" width="400" height="36" fill="none" stroke="#d8b67a" stroke-width="2"/>
-  <line x1="60" y1="96" x2="660" y2="96" stroke="#8d8d89" stroke-width="1.5"/>
-  <circle cx="120" cy="96" r="7" fill="#cfcfcb"/>
-  <circle cx="330" cy="96" r="7" fill="#cfcfcb"/>
-  <circle cx="600" cy="96" r="7" fill="#cfcfcb"/>
-  <text x="120" y="140" text-anchor="middle" fill="#cfcfcb">shade</text>
-  <text x="330" y="140" text-anchor="middle" fill="#cfcfcb">path</text>
-  <text x="600" y="140" text-anchor="middle" fill="#cfcfcb">sky</text>
-  <text x="120" y="164" text-anchor="middle" fill="#8d8d89">falls outside: black</text>
+  <text x="60" y="30" fill="#c8c8c8">One exposure for the whole frame</text>
+  <text x="660" y="30" text-anchor="end" fill="#8a8a84">brighter, to the right</text>
+  <text x="460" y="68" text-anchor="middle" fill="#8a8a84">range the screen can show</text>
+  <rect x="260" y="78" width="400" height="36" fill="none" stroke="#d9c591" stroke-width="2"/>
+  <line x1="60" y1="96" x2="660" y2="96" stroke="#8a8a84" stroke-width="1.5"/>
+  <circle cx="120" cy="96" r="7" fill="#c8c8c8"/>
+  <circle cx="330" cy="96" r="7" fill="#c8c8c8"/>
+  <circle cx="600" cy="96" r="7" fill="#c8c8c8"/>
+  <text x="120" y="140" text-anchor="middle" fill="#c8c8c8">shade</text>
+  <text x="330" y="140" text-anchor="middle" fill="#c8c8c8">path</text>
+  <text x="600" y="140" text-anchor="middle" fill="#c8c8c8">sky</text>
+  <text x="120" y="164" text-anchor="middle" fill="#8a8a84">outside the range: black</text>
 
-  <text x="60" y="210" fill="#cfcfcb">Local exposure: lift the shade, keep the rest</text>
-  <rect x="260" y="238" width="400" height="36" fill="none" stroke="#d8b67a" stroke-width="2"/>
-  <line x1="60" y1="256" x2="660" y2="256" stroke="#8d8d89" stroke-width="1.5"/>
-  <circle cx="120" cy="256" r="7" fill="none" stroke="#8d8d89" stroke-width="1.5"/>
-  <line x1="132" y1="256" x2="272" y2="256" stroke="#d8b67a" stroke-width="2"/>
-  <polygon points="282,256 270,250 270,262" fill="#d8b67a"/>
-  <circle cx="300" cy="256" r="7" fill="#d8b67a"/>
-  <circle cx="330" cy="256" r="7" fill="#cfcfcb"/>
-  <circle cx="600" cy="256" r="7" fill="#cfcfcb"/>
-  <text x="300" y="300" text-anchor="middle" fill="#cfcfcb">shade</text>
-  <text x="600" y="300" text-anchor="middle" fill="#cfcfcb">sky</text>
-  <text x="120" y="300" text-anchor="middle" fill="#8d8d89">was here</text>
+  <text x="60" y="210" fill="#c8c8c8">Local exposure lifts the shade and leaves the rest</text>
+  <rect x="260" y="238" width="400" height="36" fill="none" stroke="#d9c591" stroke-width="2"/>
+  <line x1="60" y1="256" x2="660" y2="256" stroke="#8a8a84" stroke-width="1.5"/>
+  <circle cx="120" cy="256" r="7" fill="none" stroke="#8a8a84" stroke-width="1.5"/>
+  <line x1="132" y1="256" x2="282" y2="256" stroke="#d9c591" stroke-width="2"/>
+  <polygon points="292,256 280,250 280,262" fill="#d9c591"/>
+  <circle cx="300" cy="256" r="7" fill="#d9c591"/>
+  <circle cx="330" cy="256" r="7" fill="#c8c8c8"/>
+  <circle cx="600" cy="256" r="7" fill="#c8c8c8"/>
+  <text x="120" y="300" text-anchor="middle" fill="#8a8a84">was here</text>
+  <text x="290" y="300" text-anchor="middle" fill="#c8c8c8">shade, lifted</text>
+  <text x="600" y="300" text-anchor="middle" fill="#c8c8c8">sky, unchanged</text>
 </svg>

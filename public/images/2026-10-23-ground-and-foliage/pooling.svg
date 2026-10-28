@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <text x="60" y="30" fill="#c8c8c8">Ground height across the path, with water poured to a level</text>
+  <polygon points="218.5,245 250,262 288.6,245" fill="#d9c591" fill-opacity="0.45" stroke="none"/>
+  <polygon points="485.5,245 490,248 530,268 570,252 579.2,245" fill="#d9c591" fill-opacity="0.45" stroke="none"/>
+  <polygon points="524,265 530,268 537.5,265" fill="#c8c8c8" fill-opacity="0.8" stroke="none"/>
+  <polyline points="60,200 140,205 200,235 250,262 300,240 360,205 430,208 490,248 530,268 570,252 620,214 660,205" fill="none" stroke="#c8c8c8" stroke-width="2"/>
+  <text x="250" y="292" text-anchor="middle" fill="#8a8a84">hollow</text>
+  <text x="530" y="292" text-anchor="middle" fill="#8a8a84">deeper hollow</text>
+  <rect x="60" y="316" width="30" height="12" fill="#c8c8c8" fill-opacity="0.8"/>
+  <text x="102" y="327" fill="#c8c8c8">faint wetness: only the deepest hollow holds water</text>
+  <rect x="60" y="338" width="30" height="12" fill="#d9c591" fill-opacity="0.45"/>
+  <text x="102" y="349" fill="#c8c8c8">strong wetness: every hollow below the level fills</text>
+</svg>

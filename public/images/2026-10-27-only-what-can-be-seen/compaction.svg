@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a8a84"/>
+    </marker>
+  </defs>
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <text x="360" y="60" font-size="16" fill="#d9c591" text-anchor="middle">Visible-triangle compaction for the lit pass</text>
+  <g stroke="#c8c8c8" stroke-width="1.5" fill="none">
+    <rect x="28" y="110" width="136" height="140"/>
+    <rect x="204" y="110" width="136" height="140"/>
+    <rect x="380" y="110" width="136" height="140"/>
+    <rect x="556" y="110" width="136" height="140"/>
+  </g>
+  <g stroke="#8a8a84" stroke-width="1.5" marker-end="url(#arrow)">
+    <line x1="168" y1="180" x2="200" y2="180"/>
+    <line x1="344" y1="180" x2="376" y2="180"/>
+    <line x1="520" y1="180" x2="552" y2="180"/>
+  </g>
+  <g font-size="14" text-anchor="middle">
+    <g fill="#d9c591">
+      <text x="96" y="140">Depth prepass</text>
+      <text x="272" y="140">Mark pass</text>
+      <text x="448" y="140">Compact pass</text>
+      <text x="624" y="140">Lit pass</text>
+    </g>
+    <g fill="#c8c8c8">
+      <text x="96" y="170">writes each</text>
+      <text x="96" y="192">pixel's winning</text>
+      <text x="96" y="214">triangle id</text>
+      <text x="272" y="170">compute: sets one</text>
+      <text x="272" y="192">bit per winning</text>
+      <text x="272" y="214">triangle</text>
+      <text x="448" y="170">compute: copies</text>
+      <text x="448" y="192">marked indices,</text>
+      <text x="448" y="214">writes commands</text>
+      <text x="624" y="170">ExecuteIndirect</text>
+      <text x="624" y="192">draws only the</text>
+      <text x="624" y="214">marked triangles</text>
+    </g>
+    <text x="360" y="300" fill="#8a8a84">The lit pass tests depth EQUAL against the prepass, so no pixel changes.</text>
+  </g>
+</svg>

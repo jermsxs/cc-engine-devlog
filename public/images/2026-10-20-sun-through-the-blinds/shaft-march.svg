@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="Georgia, serif" font-size="14">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <line x1="40" y1="300" x2="700" y2="300" stroke="#8a8a84" stroke-width="2"/>
+  <line x1="660" y1="60" x2="660" y2="110" stroke="#8a8a84" stroke-width="4"/>
+  <line x1="660" y1="225" x2="660" y2="300" stroke="#8a8a84" stroke-width="4"/>
+  <line x1="648" y1="128" x2="672" y2="122" stroke="#c8c8c8" stroke-width="3"/>
+  <line x1="648" y1="158" x2="672" y2="152" stroke="#c8c8c8" stroke-width="3"/>
+  <line x1="648" y1="188" x2="672" y2="182" stroke="#c8c8c8" stroke-width="3"/>
+  <line x1="648" y1="218" x2="672" y2="212" stroke="#c8c8c8" stroke-width="3"/>
+  <text x="660" y="46" text-anchor="middle" fill="#c8c8c8">Blind</text>
+  <line x1="700" y1="112" x2="431" y2="300" stroke="#d9c591" stroke-width="2"/>
+  <line x1="700" y1="142" x2="474" y2="300" stroke="#d9c591" stroke-width="2"/>
+  <line x1="700" y1="172" x2="517" y2="300" stroke="#d9c591" stroke-width="2"/>
+  <text x="540" y="90" text-anchor="middle" fill="#c8c8c8">Sun rays</text>
+  <line x1="87" y1="170" x2="600" y2="300" stroke="#c8c8c8" stroke-width="1.5"/>
+  <circle cx="80" cy="170" r="7" fill="none" stroke="#c8c8c8" stroke-width="2"/>
+  <text x="80" y="202" text-anchor="middle" fill="#c8c8c8">Eye</text>
+  <text x="230" y="170" fill="#c8c8c8">View ray, marched in steps</text>
+  <circle cx="158" cy="190" r="5" fill="#0b0b0b" stroke="#c8c8c8" stroke-width="2"/>
+  <circle cx="262" cy="216" r="5" fill="#0b0b0b" stroke="#c8c8c8" stroke-width="2"/>
+  <circle cx="366" cy="242" r="5" fill="#0b0b0b" stroke="#c8c8c8" stroke-width="2"/>
+  <circle cx="476" cy="269" r="5" fill="#d9c591"/>
+  <circle cx="507" cy="277" r="5" fill="#d9c591"/>
+  <circle cx="539" cy="285" r="5" fill="#d9c591"/>
+  <circle cx="574" cy="294" r="5" fill="#0b0b0b" stroke="#c8c8c8" stroke-width="2"/>
+  <circle cx="200" cy="332" r="5" fill="#d9c591"/>
+  <text x="212" y="337" fill="#c8c8c8">sample lit by the sun</text>
+  <circle cx="400" cy="332" r="5" fill="#0b0b0b" stroke="#c8c8c8" stroke-width="2"/>
+  <text x="412" y="337" fill="#c8c8c8">sample in shadow</text>
+</svg>

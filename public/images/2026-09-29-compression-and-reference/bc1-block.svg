@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <text x="148" y="52" fill="#c8c8c8" text-anchor="middle" font-size="15">one 4 x 4 block</text>
+  <rect x="60" y="70" width="44" height="44" fill="#3a3a34" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="82" y="97" fill="#c8c8c8" text-anchor="middle" font-size="14">0</text>
+  <rect x="104" y="70" width="44" height="44" fill="#3a3a34" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="126" y="97" fill="#c8c8c8" text-anchor="middle" font-size="14">0</text>
+  <rect x="148" y="70" width="44" height="44" fill="#6f6f69" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="170" y="97" fill="#c8c8c8" text-anchor="middle" font-size="14">1</text>
+  <rect x="192" y="70" width="44" height="44" fill="#6f6f69" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="214" y="97" fill="#c8c8c8" text-anchor="middle" font-size="14">1</text>
+  <rect x="60" y="114" width="44" height="44" fill="#3a3a34" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="82" y="141" fill="#c8c8c8" text-anchor="middle" font-size="14">0</text>
+  <rect x="104" y="114" width="44" height="44" fill="#6f6f69" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="126" y="141" fill="#c8c8c8" text-anchor="middle" font-size="14">1</text>
+  <rect x="148" y="114" width="44" height="44" fill="#6f6f69" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="170" y="141" fill="#c8c8c8" text-anchor="middle" font-size="14">1</text>
+  <rect x="192" y="114" width="44" height="44" fill="#a0a09a" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="214" y="141" fill="#0b0b0b" text-anchor="middle" font-size="14">2</text>
+  <rect x="60" y="158" width="44" height="44" fill="#6f6f69" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="82" y="185" fill="#c8c8c8" text-anchor="middle" font-size="14">1</text>
+  <rect x="104" y="158" width="44" height="44" fill="#6f6f69" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="126" y="185" fill="#c8c8c8" text-anchor="middle" font-size="14">1</text>
+  <rect x="148" y="158" width="44" height="44" fill="#a0a09a" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="170" y="185" fill="#0b0b0b" text-anchor="middle" font-size="14">2</text>
+  <rect x="192" y="158" width="44" height="44" fill="#d0d0ca" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="214" y="185" fill="#0b0b0b" text-anchor="middle" font-size="14">3</text>
+  <rect x="60" y="202" width="44" height="44" fill="#6f6f69" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="82" y="229" fill="#c8c8c8" text-anchor="middle" font-size="14">1</text>
+  <rect x="104" y="202" width="44" height="44" fill="#a0a09a" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="126" y="229" fill="#0b0b0b" text-anchor="middle" font-size="14">2</text>
+  <rect x="148" y="202" width="44" height="44" fill="#d0d0ca" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="170" y="229" fill="#0b0b0b" text-anchor="middle" font-size="14">3</text>
+  <rect x="192" y="202" width="44" height="44" fill="#d0d0ca" stroke="#0b0b0b" stroke-width="2"/>
+  <text x="214" y="229" fill="#0b0b0b" text-anchor="middle" font-size="14">3</text>
+  <text x="148" y="272" fill="#8a8a84" text-anchor="middle" font-size="14">sixteen 2-bit indices</text>
+  <text x="485" y="52" fill="#c8c8c8" text-anchor="middle" font-size="15">palette on a line through colour space</text>
+  <line x1="330" y1="140" x2="640" y2="140" stroke="#8a8a84" stroke-width="2"/>
+  <rect x="313" y="123" width="34" height="34" fill="#3a3a34" stroke="#d9c591" stroke-width="3"/>
+  <text x="313" y="182" fill="#d9c591" text-anchor="start" font-size="14">c0</text>
+  <rect x="416.3333333333333" y="123" width="34" height="34" fill="#6f6f69" stroke="#c8c8c8" stroke-width="1.5"/>
+  <text x="433.3333333333333" y="182" fill="#c8c8c8" text-anchor="middle" font-size="14">2/3 c0 + 1/3 c1</text>
+  <rect x="519.6666666666666" y="123" width="34" height="34" fill="#a0a09a" stroke="#c8c8c8" stroke-width="1.5"/>
+  <text x="536.6666666666666" y="200" fill="#c8c8c8" text-anchor="middle" font-size="14">1/3 c0 + 2/3 c1</text>
+  <rect x="623" y="123" width="34" height="34" fill="#d0d0ca" stroke="#d9c591" stroke-width="3"/>
+  <text x="657" y="182" fill="#d9c591" text-anchor="end" font-size="14">c1</text>
+  <text x="313" y="110" fill="#d9c591" text-anchor="start" font-size="14">stored endpoint</text>
+  <text x="657" y="110" fill="#d9c591" text-anchor="end" font-size="14">stored endpoint</text>
+  <text x="313" y="238" fill="#c8c8c8" font-size="14">8 bytes per block: two 16-bit endpoints</text>
+  <text x="313" y="258" fill="#c8c8c8" font-size="14">(5, 6 and 5 bits per channel) and sixteen</text>
+  <text x="313" y="278" fill="#c8c8c8" font-size="14">2-bit indices, which is 4 bits per pixel.</text>
+  <text x="40" y="332" fill="#8a8a84" font-size="14">This works when a block's colours lie close to one line. A block with two unrelated colours does not.</text>
+</svg>

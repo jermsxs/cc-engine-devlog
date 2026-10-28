@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="Georgia, serif" font-size="15">
+<rect width="720" height="360" fill="#0b0b0b"/>
+<text x="160" y="48" fill="#c8c8c8" text-anchor="middle">Glyph atlas, built once at startup</text>
+<rect x="40" y="70" width="60" height="60" fill="none" stroke="#d9c591" stroke-width="2"/>
+<text x="70.0" y="107.0" fill="#d9c591" text-anchor="middle" font-size="22">S</text>
+<rect x="100" y="70" width="60" height="60" fill="none" stroke="#3a3a37" stroke-width="1"/>
+<text x="130.0" y="107.0" fill="#8a8a84" text-anchor="middle" font-size="22">k</text>
+<rect x="160" y="70" width="60" height="60" fill="none" stroke="#d9c591" stroke-width="2"/>
+<text x="190.0" y="107.0" fill="#d9c591" text-anchor="middle" font-size="22">e</text>
+<rect x="220" y="70" width="60" height="60" fill="none" stroke="#3a3a37" stroke-width="1"/>
+<text x="250.0" y="107.0" fill="#8a8a84" text-anchor="middle" font-size="22">p</text>
+<rect x="40" y="130" width="60" height="60" fill="none" stroke="#3a3a37" stroke-width="1"/>
+<text x="70.0" y="167.0" fill="#8a8a84" text-anchor="middle" font-size="22">m</text>
+<rect x="100" y="130" width="60" height="60" fill="none" stroke="#3a3a37" stroke-width="1"/>
+<text x="130.0" y="167.0" fill="#8a8a84" text-anchor="middle" font-size="22">t</text>
+<rect x="160" y="130" width="60" height="60" fill="none" stroke="#d9c591" stroke-width="2"/>
+<text x="190.0" y="167.0" fill="#d9c591" text-anchor="middle" font-size="22">a</text>
+<rect x="220" y="130" width="60" height="60" fill="none" stroke="#3a3a37" stroke-width="1"/>
+<text x="250.0" y="167.0" fill="#8a8a84" text-anchor="middle" font-size="22">r</text>
+<rect x="40" y="190" width="60" height="60" fill="none" stroke="#3a3a37" stroke-width="1"/>
+<text x="70.0" y="227.0" fill="#8a8a84" text-anchor="middle" font-size="22">o</text>
+<rect x="100" y="190" width="60" height="60" fill="none" stroke="#d9c591" stroke-width="2"/>
+<text x="130.0" y="227.0" fill="#d9c591" text-anchor="middle" font-size="22">v</text>
+<rect x="160" y="190" width="60" height="60" fill="none" stroke="#3a3a37" stroke-width="1"/>
+<text x="190.0" y="227.0" fill="#8a8a84" text-anchor="middle" font-size="22">c</text>
+<rect x="220" y="190" width="60" height="60" fill="none" stroke="#3a3a37" stroke-width="1"/>
+<text x="250.0" y="227.0" fill="#8a8a84" text-anchor="middle" font-size="22">i</text>
+<rect x="40" y="250" width="60" height="60" fill="none" stroke="#3a3a37" stroke-width="1"/>
+<text x="70.0" y="287.0" fill="#8a8a84" text-anchor="middle" font-size="22">n</text>
+<rect x="100" y="250" width="60" height="60" fill="none" stroke="#3a3a37" stroke-width="1"/>
+<text x="130.0" y="287.0" fill="#8a8a84" text-anchor="middle" font-size="22">d</text>
+<rect x="160" y="250" width="60" height="60" fill="none" stroke="#3a3a37" stroke-width="1"/>
+<text x="190.0" y="287.0" fill="#8a8a84" text-anchor="middle" font-size="22">l</text>
+<rect x="220" y="250" width="60" height="60" fill="none" stroke="#3a3a37" stroke-width="1"/>
+<text x="250.0" y="287.0" fill="#8a8a84" text-anchor="middle" font-size="22">h</text>
+<line x1="290" y1="190" x2="440" y2="190" stroke="#c8c8c8" stroke-width="1.5"/>
+<polygon points="440,190 430,185 430,195" fill="#c8c8c8"/>
+<text x="365" y="176" fill="#8a8a84" text-anchor="middle">UV rectangle</text>
+<text x="365" y="212" fill="#8a8a84" text-anchor="middle">per glyph</text>
+<text x="560" y="48" fill="#c8c8c8" text-anchor="middle">Text("Save") on screen</text>
+<rect x="460" y="160" width="44" height="60" fill="none" stroke="#d9c591" stroke-width="2"/>
+<text x="482" y="198" fill="#d9c591" text-anchor="middle" font-size="22">S</text>
+<rect x="510" y="160" width="44" height="60" fill="none" stroke="#d9c591" stroke-width="2"/>
+<text x="532" y="198" fill="#d9c591" text-anchor="middle" font-size="22">a</text>
+<rect x="560" y="160" width="44" height="60" fill="none" stroke="#d9c591" stroke-width="2"/>
+<text x="582" y="198" fill="#d9c591" text-anchor="middle" font-size="22">v</text>
+<rect x="610" y="160" width="44" height="60" fill="none" stroke="#d9c591" stroke-width="2"/>
+<text x="632" y="198" fill="#d9c591" text-anchor="middle" font-size="22">e</text>
+<text x="560" y="250" fill="#8a8a84" text-anchor="middle">four quads, one draw list</text>
+<text x="560" y="274" fill="#8a8a84" text-anchor="middle">pixel = text colour x coverage</text>
+<text x="360" y="342" fill="#c8c8c8" text-anchor="middle">Text is drawn as textured quads that crop glyphs out of one coverage texture.</text>
+</svg>

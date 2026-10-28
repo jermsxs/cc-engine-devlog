@@ -1,79 +1,125 @@
 ---
-title: Door gaps, matte wood and the look of velvet
+title: Door gaps, matte furniture and a sheen model for velvet
 date: 2026-10-17
 order: 1
-summary: Three causes of light creeping round closed doors, furniture that stops looking varnished, a cloth shading model for velvet, and props that no longer escape the house.
+summary: Three causes of light around closed doors, matte finishes for old furniture, a cloth sheen BRDF for velvet, and three collision faults found by a throw test.
 tags: lighting, materials, physics
 cover: /images/2026-10-17-door-gaps-cloth-sheen/armchair-flashlight.jpg
 ---
 
-After the previous day's leak hunt I played the house again and noticed two more things. Light still crept in round the sides of closed doors, and the furniture looked hard and glossy, as if everything had been freshly lacquered. Neither belongs in a decayed old house. This post is about both, then about the velvet that those matte changes left looking wrong, and a bug report about thrown objects.
+The previous day's leak fixes removed most of the light passing through walls. Playing the house again, I saw two more problems. Light still showed along the sides of closed doors, and the furniture had a hard, glossy look under the lamps, as if it had just been lacquered. Neither belongs in a decayed house. This post covers both, then the velvet that the matte change left looking like smooth painted cloth, and a short section on props leaving the map.
 
-## Light round the doors: three causes in a row
+## Light around closed doors
 
-The method was the same as the day before: switch the room off, freeze the camera on its closed door, and boost the image eight times so that anything faint shows. Pixels brighter than a very low threshold gave me a number to push down. Around the parlor door there were 9,465 of them.
+I used the same method as the day before. I switched the room off, froze the camera on its closed door and boosted the image eight times so that anything faint shows. Counting pixels above a low threshold gave me a number to reduce. Around the parlor door there were 9,465 of them. Three separate causes were stacked on top of each other.
 
-It turned out there were three separate causes, one hiding behind the other.
+### Cause one: a slot through the wall
 
-**One: a slot through the wall.** The door frame's opening was 4 cm wider than the door leaf, a 2 cm gap each side. The stops that the closed door rests against were only 12 mm wide, so 8 mm of clear air remained beside and above every closed door. The fix is what a real carpenter does: the stops now reach 1 cm behind the leaf's edge.
+The door frame's opening is 4 cm wider than the leaf, which leaves a 2 cm gap on each side. The stops that the closed leaf rests against were 12 mm wide, so 8 mm of clear air remained beside and above every closed door. A carpenter's stop overlaps the leaf. Mine now reach 1 cm behind the leaf's edges. The lines of light did not go away, so this was not the whole explanation.
 
-**Two: the corridor lamps lit the inside of the gap.** The stops sit on the corridor side, so from the room you still look down a 2 cm channel to the stop. The corridor lamps' light boxes and their soft fade carried 4.2 cm into the 8 cm wall, enough to light the far half of that channel. The tools that fit a lamp to its room now end the fade a fifth of the way into the wall, before a closed door's stop.
+### Cause two: the corridor lamps lit the inside of the gap
 
-**Three: the lightmap.** With the first two fixed, a soft glow remained on the casing beside the hinge. An ambient-only view showed it was baked light.
+The stops sit on the corridor side. From inside a room you still look down a 2 cm channel to the stop. The corridor lamps' light boxes ended 1 cm inside the 8 cm wall, and their 3.2 cm fade carried light 4.2 cm in, which lit the far half of the jamb and the leaf edge in the channel. The fitting tools now end a light's fade a fifth of the way into the wall, 1 to 1.6 cm here, which is before a closed door's stop at 1.75 cm. The corridor lamps are fitted to the wall faces with no padding. The thin lines went, but a soft glow remained on the casing beside the hinge.
 
-> **Concept: Texel density and thin surfaces.** A lightmap is a texture that stores light on surfaces, and its pixels are called *texels*. In the house a texel covers 10 cm of wall. The inside lining of a door frame is only 8.8 cm deep, so it was given two texels across it: one on its corridor edge, and the next 1.2 cm past its room edge. Each texel stores the light at its own spot, and the surface between them is a blend. So the corridor's light covered the whole face and bled onto the casing next to it.
+### Cause three: the lightmap
 
-The fix is a rule: any narrow face gets at least three texels across, at its two edges and its middle. That reads light from the middle of the face rather than from one edge. It applies to every thin face of every model, such as trim edges and frame mouldings. The lightmap grew about 10%, from 18.1 to 19.9 MB.
+An ambient-only view showed that the remaining glow was baked light.
 
-Pixels brighter than the threshold around the parlor door fell from 9,465 to 316, and with every circuit off the scene has 264 anyway, so the rest is noise.
+> **Background: texel density and thin surfaces.** A lightmap is a texture laid over the surfaces, and its pixels are called texels. Each texel stores the light at one position, and the renderer interpolates between texels. A feature of the light can only be represented if the texels are denser than the feature. This is the sampling rule that applies to any signal: at least two samples across the smallest variation you want to keep. Thin geometry such as a door lining or a moulding is narrower than a coarse texel, so it gets very few samples, and each sample can be dominated by whatever light happens to reach it.
 
-![Light round the closed parlor door, before and after](/images/2026-10-17-door-gaps-cloth-sheen/door-gap-before-after.jpg "The parlor door from inside, room dark, boosted eight times. Before (left): thin lines of light round the edge. After (right): nothing.")
+The house's lightmaps use 10 texels per metre, so one texel is 10 cm. The inside lining of the door frame runs 8.8 cm through the wall. Its chart had two texels across: one on its corridor edge and the next 1.2 cm past its room edge. Every point on the face was a blend of those two samples, and the corridor edge's sample carried the corridor lamps' light. The corridor's light covered the whole face and bled onto the casing next to it.
 
-## Furniture that didn't look old
+![The casing beside the hinge with the corridor circuit's baked light in red](/images/2026-10-17-door-gaps-cloth-sheen/door-casing-bake-glow.jpg "A debug view of the casing beside the hinge. The red is the corridor circuit's baked light, coming from the lining's single corridor-edge texel.")
 
-The shine on the furniture was real. When I made the furniture I gave the mahogany a roughness between 0.32 and 0.72, a varnished finish. At a low angle the dining lamp drew a lacquer streak across the table.
+The rule I added is that any chart axis narrower than two texels gets three, on its two edges and in its middle, using a per-axis density on each chart. The middle sample means the face reads light from its centre rather than from one edge. The rule applies to every thin face of every glTF, including trim edges, frame mouldings and stops. The house's lightmap grew about 10%, from 18.1 to 19.9 MB, and the hallway's from 348 thousand to 391 thousand texels.
 
-> **Concept: Roughness.** In physically based rendering, *roughness* describes how scattered a surface's reflection is. At 0 the surface is a mirror and a lamp gives a sharp highlight. At 1 the surface scatters light in every direction and there is no highlight at all, only an even, flat look. Real old wood, worn and dusty, sits near the top of that scale.
+### Results
 
-The week before I had only checked the walls (0.94). Now I pushed the old finishes towards dull: mahogany 0.72 to 0.94, door wood 0.68 to 0.92, trim 0.72 to 0.92. The bath's enamel, the mirror and the brass stay glossy, since that is what they are. This is a taste I will keep coming back to. I like dark, grimy surfaces in this engine, not a showroom.
+With the parlor dark, the flashlight off and the image boosted eight times, the pixels brighter than 4/255 around the door fell from 9,465 to 316. With every circuit off the scene has 264, so the rest is noise. The 99.9th percentile fell from 31 to 3. The dining room's door shows zero pixels. The corridor side of the parlor door, with the corridor dark and the parlor lit, is unchanged at the floor. GPU time moved by +0.3% to +3% per bench pose, 0.01 to 0.04 ms.
 
-![The dining table with the lamp lit, before and after](/images/2026-10-17-door-gaps-cloth-sheen/table-sheen-before-after.jpg "From table height with the lamp lit. Left: a varnish sheen across the table top. Right: matte, with the shine gone.")
+![Light around the closed parlor door before and after](/images/2026-10-17-door-gaps-cloth-sheen/door-gap-before-after.jpg "The parlor door from inside with the room dark and the image boosted eight times. Before (left): thin lines of light along the door's edges. After (right): none.")
 
-## Why velvet looks like velvet
+## Furniture that did not look old
 
-Once the furniture was matte, the velvet armchairs looked like smooth painted cloth. A real velvet works the other way round from a shiny surface. Its fibres stand up from the weave. So:
+The shine on the furniture was real. When I made the furniture I gave the mahogany a roughness between 0.32 and 0.72, a varnished finish. At a low angle the dining lamp drew a lacquer streak across the table top. The week before I had checked only the walls, at 0.94, and not the furniture.
 
-- looking straight at it, you see down between the fibres into shadow, and it reads *dark*;
-- at its edges and folds you see the fibres side-on, and they catch the light, giving a pale rim.
+> **Background: roughness, GGX and Fresnel.** In physically based rendering a surface's specular reflection comes from microscopic facets. Roughness describes how widely their normals scatter. My shader converts perceptual roughness to `alpha = roughness^2` and uses the GGX distribution, `D = alpha^2 / (pi * ((n.h)^2 * (alpha^2 - 1) + 1)^2)`, where `h` is the vector halfway between the view and the light. `D` is largest when `h` equals the surface normal. Its peak value is `1 / (pi * alpha^2)`, which is about 30 at roughness 0.32 and about 0.5 at roughness 0.9. A rough surface spreads the same light over a much wider range of angles, so the highlight is wide and dim. The Fresnel term, Schlick's approximation `F = F0 + (1 - F0)(1 - v.h)^5`, rises towards 1 at grazing angles for every material. A low lamp, a table top and a viewer at table height are the grazing case. A moderately rough finish still produces a long bright streak there.
 
-There is no highlight at all, and the brightness goes up at grazing angles, the opposite of normal shiny reflections.
+I made the old finishes dull, as an old house's would be.
 
-> **Theory: The sheen lobe.** A normal specular highlight peaks when the view mirrors the light. A cloth *sheen* lobe peaks the other way: it reflects most at grazing angles and almost nothing head-on. The glTF format has a standard extension for it, built on a model by Estevez and Kulla (2017). It adds a soft layer on top of the base material. The base gives up the light the layer takes, so the cloth never reflects more light than arrives. A small fitted curve gives how much the layer takes at each angle, and I checked it against the fully integrated lobe to within 0.025.
+| Material | Roughness |
+|---|---|
+| Mahogany | 0.72 to 0.94 |
+| Velvet | 0.88 to 0.96 (was 0.70 to 0.90) |
+| Door wood | 0.68 to 0.92 (was 0.42 to 0.75) |
+| Painted trim | 0.72 to 0.92 |
+| Picture-frame wood | 0.70 to 0.88 |
+| Cot and kitchen paint | 0.78 to 0.88 |
 
-In practice the sheen is a handful of numbers read from the model file: a colour and a roughness. Blender can export the same extension, so cloth modelled there carries over. Materials without it skip the code entirely. It lives in its own shader file, because my main scene shader has a strict 400-line budget.
+The bath's enamel, the mirror and the brass stay glossy, since that is what they are. This is a preference I intend to keep. I do not want showroom surfaces in this engine.
 
-My first values were too strong. Under the flashlight they washed the whole armchair pink, including the faces turned towards me. I halved the colour and narrowed the lobe, so the change now sits at the edges. Linen and wool use the same model, more weakly.
+![The dining table with the lamp lit, before and after](/images/2026-10-17-door-gaps-cloth-sheen/table-sheen-before-after.jpg "The dining table from table height with the lamp lit. Left: a varnish sheen across the top. Right: matte.")
 
-![A velvet armchair under the flashlight, before and after](/images/2026-10-17-door-gaps-cloth-sheen/armchair-flashlight.jpg "The master bedroom armchair under the flashlight. Left: smooth cloth. Right: the same chair with a faint pale rim at its edges and arms.")
+From above under the flashlight, the brightest highlight on the table top fell from 207 to 190 at the 99.5th percentile.
+## A sheen model for velvet
 
-A difference map shows exactly where the change landed: not on the back facing the camera, but along the silhouette and the tops of the arms.
+With the furniture matte, the velvet armchairs read as smooth painted cloth. Velvet does not behave like a varnished surface.
 
-![The change, after minus before](/images/2026-10-17-door-gaps-cloth-sheen/sheen-difference.jpg "The sheen's contribution, boosted six times. It is dark on faces that look at the camera and bright along the edges.")
+### The phenomenon
 
-Under the room's own lamp the change is much smaller. The lamp is behind and above the chair, so the faces I see are lit nearly head-on, where velvet barely sheens at all. That is physically right, and it also means this is a subtle effect I should not oversell.
+Velvet, and to a lesser degree linen and wool, has short fibres that stand up from the weave. Looking straight at it, you see down between the fibres into shadow, so the surface reads dark. At the edges and folds you look across the sides of the fibres, which catch the light, and the surface reads lighter. The effect is a pale rim around the silhouette with no highlight. Fibres standing steeply out of the surface scatter light back towards the direction it came from, and the area of fibre side that faces the viewer grows at grazing angles. The effect is strongest when both the light and the viewer are at grazing angles.
 
-## Switches checked, and props that stay in the house
+### The model
 
-A report from play came in: the hall switch didn't turn the hall lights off. I could not reproduce it. A real press of the corridor switch puts out all twelve lamps, and the same press in the editor's Play mode flips the toggle and prompt. A new test aims at every switch from 0.6 to 2 m away and up to 60 degrees off its face, and each one takes the focus. My best guess is a mix-up: the corridor switch and the foyer switch sit back to back at the foyer doorway, and the foyer one only runs the foyer lamp.
+A normal specular lobe peaks when the half vector `h` equals the normal, which is a mirror-like geometry. A cloth lobe must peak the other way. The glTF extension `KHR_materials_sheen` specifies the Charlie distribution from Estevez and Kulla (2017), whose shape is inverted compared with GGX:
 
-![The corridor switch pressed, on and off](/images/2026-10-17-door-gaps-cloth-sheen/corridor-switch.jpg "The ground corridor with its lamps on (left), and after the press (right). Only the far window stays lit, by design.")
+```hlsl
+D_Charlie = (2 + 1/alpha) * pow(sin(theta_h), 1/alpha) / (2*pi)   // alpha = roughness^2
+```
 
-The second report was that a ball thrown at a wall or into a corner sometimes left the map. So I wrote a test that throws six kinds of prop from eleven spots, in 24 directions at three pitches, hard and soft, and fails if anything crosses a solid surface. It found three different faults:
+Here `theta_h` is the angle between `h` and the normal. The term is zero when `h` equals the normal and largest when `h` lies in the surface plane, which happens when the view and the light are both near grazing. A smaller roughness makes the lobe narrower. A fitted visibility function replaces the usual shadowing term. The five coefficients of its exponent are fitted at the two extremes of roughness and blended between them.
 
-1. **Tins and bottles through walls.** A tilted cylinder touching a wall kept only one contact point, so a spinning tin pivoted on it and swung its far end through an 8 cm wall. It now keeps both ends of its side. Before: 6 of 30 tins and 21 of 30 bottles went through. After: none.
-2. **A book sinking through the floor.** A book lying flat had edges almost exactly parallel to the floor's. I use the cross product of two edges as a test direction, but for nearly parallel edges it is mostly rounding error, and on one frame it said "apart". Edge pairs within about 0.06 degrees of parallel are now skipped, because the face tests already cover them.
-3. **A book spinning through a stair rail.** Contacts are found once per sixtieth of a second, and a book tumbling at 30 radians a second turned almost 30 degrees between checks. As a last guard, if a body's centre would have crossed a static surface in a step, it goes back, loses its speed into that surface and half its spin. In the house this fires in 13 throws of 9,504, so real contacts do the work.
+The sheen is a layer on top of the base material. The layer takes some of the light, so the base must give that light up, or the cloth would reflect more than it receives. The shader scales the base by `1 - max(sheenColor) * albedo(NoV)`, where `albedo` is the fraction of light the white sheen lobe reflects from a given view angle. I use a polynomial and exponential fit of that integrated value, valid for roughness 0.2 to 1. The same albedo lets ambient light light the sheen, which keeps the rim visible on cloth in a dark room.
 
-## Where it stood
+The input is two numbers from the model file, `sheenColorFactor` and `sheenRoughnessFactor`. Blender exports the same extension, so cloth modelled there carries over. Materials without sheen skip the code. The code lives in its own include, `Sheen.hlsli`, because the scene shader has a 400-line budget, and the Model Viewer uses the same shading.
 
-The doors sealed, the wood looked old, and the velvet had a rim. Two follow-ups stayed open: a closed door still leaves a 2 mm gap at the threshold, so a lit corridor shows a hairline under it, which is realistic; and the cloth sheen is deliberately faint, since I would rather it be too quiet than make the house look plush.
+My first values were too strong. Under the flashlight they washed the whole armchair pink, including the faces turned toward me. I halved the colour and narrowed the velvet's lobe from roughness 0.45 to 0.35 so that the change sits at the edges.
+
+| Cloth | Sheen colour | Sheen roughness |
+|---|---|---|
+| Velvet (armchairs, chair seats) | 0.15, 0.065, 0.045 | 0.35 |
+| Linen (sheets, pillows, kitchen curtain) | 0.05 | 0.6 |
+| Wool blanket | 0.035 to 0.04 | 0.7 |
+
+### Results
+
+`BrdfTests` checks the model. The fitted albedo is within 0.035 of a numerically integrated lobe at roughness 0.2 to 1 and five view angles. A white surface under a white sheen reflects at most 1.06, which is the base BRDF's own fit error. The lobe is reciprocal, and it reflects more than four times as much near grazing as near head-on.
+
+![A velvet armchair under the flashlight, before and after](/images/2026-10-17-door-gaps-cloth-sheen/armchair-flashlight.jpg "The master bedroom armchair under the flashlight. Left: smooth cloth. Right: the same chair with a faint pale rim along its edges and arms.")
+
+A difference map, after minus before and boosted six times, shows where the change landed. It is smallest on the back facing the camera and largest along the silhouette and the arm tops. Under the flashlight the chair's mean brightness rose by 2.1/255.
+
+![The sheen's contribution as a difference map](/images/2026-10-17-door-gaps-cloth-sheen/sheen-difference.jpg "After minus before, boosted six times. The change is dark on faces that look at the camera and bright along the edges.")
+
+Under the room's own lamp the change is very small, a mean of 0.07/255. The lamp is behind and above the chair, so the faces I see are lit almost head-on, where velvet barely shows sheen. The bed changes little too, because linen and wool are faint by design. This is a subtle effect, and I am keeping it that way.
+
+## Switches checked, and props that stayed in the house
+
+In play, the hall light switch did not seem to turn the hall lights off. I could not reproduce it. A real press of the corridor switch puts out all twelve lamps with their globes and bounce light, and the same press in the editor's Play mode flips the toggle and prompt. A new test aims at every switch from 0.6 to 2 m away and up to 60 degrees off its face, and each one takes the interaction focus. The corridor switch and the foyer switch sit back to back at the foyer doorway, and the foyer one runs only the foyer lamp. That is the likely mix-up, but I have not confirmed which switch it was.
+
+In play I also saw a thrown ball leave the map at a wall or corner. I wrote a test that throws six props, a ball, tin, mug, bottle, book and crate, from 11 places on both floors in 24 directions at three pitches, at 12 m/s and at 7 m/s while spinning. It fails if a prop's centre crosses a solid surface between frames or if a prop ends outside the house. That is 1,584 throws per prop and 9,504 in total. It found three faults.
+
+> **Background: tunnelling and discrete contacts.** My physics steps at 1/60 s and finds contacts once per step. A fast or fast-spinning body can move through a thin obstacle between two steps, which is called tunnelling. The collision test between boxes uses a set of separating axes, including the cross products of pairs of edges. If two edges are nearly parallel, the cross product is close to zero and mostly rounding error, so the axis can wrongly report that the shapes are apart.
+
+1. **Tins and bottles through walls.** When a tilted cylinder touched a wall, the contact code kept only the nearest point, so a spinning tin pivoted on it and its far end swung through an 8 cm wall. It now keeps both ends of the line along its side. In an isolated test, 6 of 30 tins and 21 of 30 bottles went through before the fix, and none after.
+2. **A book sinking through the floor.** A book lying flat had edges almost exactly parallel to the floor's, and on one frame the edge-cross axis said the shapes were apart. Edge pairs within about 0.06 degrees of parallel are now skipped, because the face tests cover them.
+3. **A book spinning through the stair rail.** A book tumbling at about 30 rad/s turned almost 30 degrees between contact checks and passed through a 6 cm handrail. As a last guard, if a body's centre would have crossed a static surface during a step, it goes back to where it was, loses its speed into that surface and half its spin. In the house the guard acts in 13 of the 9,504 throws, so the contacts do the real work. The test fails if it acts in more than 1%.
+
+## Results and open items
+
+The doors are sealed against light, the furniture reads as old, and the velvet has a rim. Each change passed the full test suite (98 to 99 tests, in Release and in Debug) and the validation script. Open items:
+
+- A closed door still leaves a 2 mm gap over its threshold, so a lit corridor shows a hairline under it. That is realistic, and I may close it later.
+- The sheen is deliberately faint. If the velvet should read more strongly, I raise `VELVET_SHEEN` in the furniture script, regenerate and rebake.
+- Rect lights add no sheen, sheen textures are not read, and library materials have no sheen field yet.
+- The hallway scene still has the old fades. I will refit its lamps with `light_fit_bounds` the next time I work on it.

@@ -6,10 +6,10 @@ import { Marked } from 'marked';
 
 const SITE = {
   title: 'CC Engine Dev Diary',
-  tagline: 'Building a survival-horror engine from scratch, one session at a time.',
-  author: 'ghostmountain3',
+  tagline: 'Notes from building a survival-horror engine from scratch in C++ and DirectX 12.',
   url: 'https://cc-engine-devlog.vercel.app',
 };
+const PER_PAGE = 8;
 
 const ROOT = process.cwd();
 const DIST = join(ROOT, 'dist');
@@ -71,10 +71,10 @@ function makeMarked(slug) {
         checkAsset(token.href, slug);
         return `<img src="${token.href}" alt="${escapeHtml(token.text)}" loading="lazy" decoding="async">`;
       },
-      // "> **Concept: ...**" blockquotes become concept boxes.
+      // "> **Background: ...**" blockquotes become boxed explanations.
       blockquote(token) {
         const inner = this.parser.parse(token.tokens);
-        const cls = /^<p><strong>(Concept|In practice|Theory|Note)\b/i.test(inner) ? ' class="concept"' : '';
+        const cls = /^<p><strong>(Background|Concept|In practice|Theory|Note|How it works)\b/i.test(inner) ? ' class="aside"' : '';
         return `<blockquote${cls}>\n${inner}</blockquote>\n`;
       },
       table(token) {
@@ -88,14 +88,64 @@ function makeMarked(slug) {
 // --- templates ---------------------------------------------------------------
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const parts = (iso) => iso.split('-').map(Number);
 const formatDate = (iso) => {
-  const [y, m, d] = iso.split('-').map(Number);
+  const [y, m, d] = parts(iso);
   return `${MONTHS[m - 1]} ${d}, ${y}`;
 };
-const readingMinutes = (md) => Math.max(1, Math.round(md.split(/\s+/).length / 230));
+const dayHeader = (iso) => {
+  const [y, m, d] = parts(iso);
+  return `${WEEKDAYS[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]}, ${MONTHS[m - 1]} ${d}, ${y}`;
+};
 
-function layout({ title, description, body, path = '/', image = '' }) {
-  const fullTitle = title ? `${title} · ${SITE.title}` : SITE.title;
+function sidebar(posts, current) {
+  const byMonth = new Map();
+  for (const p of [...posts].reverse()) {
+    const [y, m] = parts(p.date);
+    const key = `${y}-${m}`;
+    if (!byMonth.has(key)) byMonth.set(key, { label: `${MONTHS[m - 1]} ${y}`, list: [] });
+    byMonth.get(key).list.push(p);
+  }
+  const currentMonth = current ? (([y, m]) => `${y}-${m}`)(parts(current.date)) : [...byMonth.keys()][0];
+  const archive = [...byMonth]
+    .map(
+      ([key, { label, list }]) => `<details${key === currentMonth ? ' open' : ''}><summary>${label} <span class="count">(${list.length})</span></summary><ul>
+${list.map((p) => `<li>${current && p.slug === current.slug ? `<strong>${escapeHtml(p.title)}</strong>` : `<a href="/posts/${p.slug}/">${escapeHtml(p.title)}</a>`}</li>`).join('\n')}
+</ul></details>`
+    )
+    .join('\n');
+  const tagCounts = new Map();
+  for (const p of posts) for (const t of p.tags) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
+  const labels = [...tagCounts]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([t, n]) => `<li><a href="/labels/${t}/">${escapeHtml(t)}</a> <span class="count">(${n})</span></li>`)
+    .join('\n');
+  return `<aside class="sidebar">
+<section>
+<h2>About</h2>
+<p>I'm building the CC Horror Engine, a survival-horror engine and editor written from scratch in C++20 and DirectX 12. This is my working diary: what I built each day, how it works, and what went wrong.</p>
+<p><a href="/about/">More about the engine</a></p>
+</section>
+<section>
+<h2>Blog archive</h2>
+${archive}
+</section>
+<section>
+<h2>Labels</h2>
+<ul class="labels">
+${labels}
+</ul>
+</section>
+<section>
+<h2>Subscribe</h2>
+<p><a href="/feed.xml">Posts (RSS)</a></p>
+</section>
+</aside>`;
+}
+
+function layout({ title, description, body, path = '/', image = '', posts, current = null }) {
+  const fullTitle = title ? `${SITE.title}: ${title}` : SITE.title;
   const ogImage = image ? `${SITE.url}${image}` : '';
   return `<!doctype html>
 <html lang="en">
@@ -112,92 +162,109 @@ ${ogImage ? `<meta property="og:image" content="${ogImage}">\n<meta name="twitte
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="${escapeHtml(SITE.title)}" href="/feed.xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<header class="site-header">
-  <a class="brand" href="/">CC Engine<span>/</span>Dev Diary</a>
-  <nav><a href="/">Diary</a><a href="/about/">About</a></nav>
+<div id="outer">
+<header id="header">
+  <h1><a href="/">${escapeHtml(SITE.title)}</a></h1>
+  <p class="description">${escapeHtml(SITE.tagline)}</p>
 </header>
-<main>
+<div id="content">
+<main id="main">
 ${body}
 </main>
-<footer class="site-footer">
-  <p>A from-scratch C++20 / DirectX 12 horror engine.</p>
-  <p><a href="/feed.xml">RSS</a></p>
+${sidebar(posts, current)}
+</div>
+<footer id="footer">
+  <p>CC Engine Dev Diary &middot; written and built by hand &middot; <a href="/feed.xml">RSS</a></p>
 </footer>
+</div>
 </body>
 </html>
 `;
 }
 
-function postPage(post, prev, next) {
-  const marked = makeMarked(post.slug);
-  const html = marked.parse(post.body);
-  const tags = post.tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('');
-  const nav = `<nav class="post-nav">
-  ${prev ? `<a class="prev" href="/posts/${prev.slug}/"><span>← Earlier</span>${escapeHtml(prev.title)}</a>` : '<span></span>'}
-  ${next ? `<a class="next" href="/posts/${next.slug}/"><span>Later →</span>${escapeHtml(next.title)}</a>` : '<span></span>'}
-</nav>`;
-  const body = `<article class="post">
-  <header class="post-header">
-    <p class="meta"><time datetime="${post.date}">${formatDate(post.date)}</time><span>·</span>${readingMinutes(post.body)} min read</p>
-    <h1>${escapeHtml(post.title)}</h1>
-    <p class="lead">${escapeHtml(post.summary)}</p>
-    ${tags ? `<p class="tags">${tags}</p>` : ''}
-  </header>
-  <div class="prose">
+const postFooter = (post) =>
+  `<p class="post-footer">Posted on ${formatDate(post.date)}${post.tags.length ? ` &middot; Labels: ${post.tags.map((t) => `<a href="/labels/${t}/">${escapeHtml(t)}</a>`).join(', ')}` : ''}</p>`;
+
+function postPage(post, prev, next, posts) {
+  const html = makeMarked(post.slug).parse(post.body);
+  const body = `<h2 class="date-header">${dayHeader(post.date)}</h2>
+<article class="post">
+  <h3 class="post-title">${escapeHtml(post.title)}</h3>
+  <p class="post-summary">${escapeHtml(post.summary)}</p>
+  <div class="post-body">
 ${html}
   </div>
+  ${postFooter(post)}
 </article>
-${nav}`;
-  return layout({ title: post.title, description: post.summary, body, path: `/posts/${post.slug}/`, image: post.cover });
+<nav class="blog-pager">
+  ${next ? `<a class="newer" href="/posts/${next.slug}/" title="${escapeHtml(next.title)}">&laquo; Newer post</a>` : '<span class="newer"></span>'}
+  <a class="home" href="/">Home</a>
+  ${prev ? `<a class="older" href="/posts/${prev.slug}/" title="${escapeHtml(prev.title)}">Older post &raquo;</a>` : '<span class="older"></span>'}
+</nav>`;
+  return layout({ title: post.title, description: post.summary, body, path: `/posts/${post.slug}/`, image: post.cover, posts, current: post });
 }
 
-function indexPage(posts) {
-  const newestFirst = [...posts].reverse();
-  const groups = new Map();
-  for (const p of newestFirst) {
-    const [y, m] = p.date.split('-').map(Number);
-    const key = `${MONTHS[m - 1]} ${y}`;
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(p);
-  }
-  const first = posts[0];
-  const sections = [...groups]
-    .map(
-      ([month, list]) => `<section class="month">
-  <h2>${month}</h2>
-  <ol class="post-list">
-${list
-  .map(
-    (p) => `    <li><a href="/posts/${p.slug}/">
-      ${p.cover ? `<img src="${p.cover}" alt="" loading="lazy" decoding="async">` : '<span class="no-cover"></span>'}
-      <div><time datetime="${p.date}">${formatDate(p.date)}</time><h3>${escapeHtml(p.title)}</h3><p>${escapeHtml(p.summary)}</p></div>
-    </a></li>`
-  )
-  .join('\n')}
-  </ol>
-</section>`
-    )
+// A post as it appears on the front page and label pages: title, picture, summary and a link.
+function excerpt(p, showDate) {
+  return `${showDate ? `<h2 class="date-header">${dayHeader(p.date)}</h2>\n` : ''}<article class="post">
+  <h3 class="post-title"><a href="/posts/${p.slug}/">${escapeHtml(p.title)}</a></h3>
+  <div class="post-body">
+    ${p.cover ? `<a href="/posts/${p.slug}/"><img class="excerpt-image" src="${p.cover}" alt="" loading="lazy" decoding="async"></a>` : ''}
+    <p>${escapeHtml(p.summary)}</p>
+    <p class="read-more"><a href="/posts/${p.slug}/">Read the full entry &raquo;</a></p>
+  </div>
+  ${postFooter(p)}
+</article>`;
+}
+
+function listing(list) {
+  let lastDate = '';
+  return list
+    .map((p) => {
+      const html = excerpt(p, p.date !== lastDate);
+      lastDate = p.date;
+      return html;
+    })
     .join('\n');
-  const body = `<section class="intro">
-  <h1>Building a horror engine from scratch.</h1>
-  <p>This is the diary of the CC Horror Engine: a C++20 and DirectX 12 engine and editor I'm writing without third-party libraries, aimed at the dim, grimy look of Resident Evil 7 and Village. Each post explains what I added, the theory behind it, and how it works in practice.</p>
-  <p class="intro-links"><a href="/posts/${first.slug}/">Start from day one →</a><span>${posts.length} entries · ${formatDate(first.date)} to ${formatDate(posts[posts.length - 1].date)}</span></p>
-</section>
-${sections}`;
-  return layout({ title: '', description: SITE.tagline, body, path: '/' , image: posts[posts.length - 1].cover });
 }
 
-function aboutPage() {
-  const marked = makeMarked('about');
-  const html = marked.parse(readFileSync(join(ROOT, 'about.md'), 'utf8'));
-  const body = `<article class="post"><header class="post-header"><h1>About the engine</h1></header><div class="prose">${html}</div></article>`;
-  return layout({ title: 'About', description: 'What the CC Horror Engine is and how it is built.', body, path: '/about/' });
+function indexPages(posts) {
+  const newestFirst = [...posts].reverse();
+  const pages = Math.ceil(newestFirst.length / PER_PAGE);
+  const out = [];
+  for (let i = 0; i < pages; i++) {
+    const href = (n) => (n === 0 ? '/' : `/page/${n + 1}/`);
+    const intro =
+      i === 0
+        ? `<div class="welcome"><p>This diary follows the engine from its first commit in June 2026. Each entry covers one day or one feature: what I set out to do, the graphics or engine theory behind it, how I implemented it, and how I measured the result. <a href="/posts/${posts[0].slug}/">Start from the first entry</a>, or read the newest below.</p></div>\n`
+        : '';
+    const pager = `<nav class="blog-pager">
+  ${i > 0 ? `<a class="newer" href="${href(i - 1)}">&laquo; Newer posts</a>` : '<span class="newer"></span>'}
+  <span class="home">Page ${i + 1} of ${pages}</span>
+  ${i < pages - 1 ? `<a class="older" href="${href(i + 1)}">Older posts &raquo;</a>` : '<span class="older"></span>'}
+</nav>`;
+    const body = intro + listing(newestFirst.slice(i * PER_PAGE, (i + 1) * PER_PAGE)) + '\n' + pager;
+    out.push({ path: href(i), html: layout({ title: i ? `Page ${i + 1}` : '', description: SITE.tagline, body, path: href(i), image: posts[posts.length - 1].cover, posts }) });
+  }
+  return out;
+}
+
+function labelPages(posts) {
+  const tags = [...new Set(posts.flatMap((p) => p.tags))];
+  return tags.map((t) => {
+    const list = [...posts].reverse().filter((p) => p.tags.includes(t));
+    const body = `<div class="status-msg">Showing ${list.length} posts with the label <strong>${escapeHtml(t)}</strong>. <a href="/">Show all posts</a></div>\n${listing(list)}`;
+    return { path: `/labels/${t}/`, html: layout({ title: `Label: ${t}`, description: `Posts labelled ${t}`, body, path: `/labels/${t}/`, posts }) };
+  });
+}
+
+function aboutPage(posts) {
+  const html = makeMarked('about').parse(readFileSync(join(ROOT, 'about.md'), 'utf8'));
+  const body = `<article class="post"><h3 class="post-title">About the engine</h3><div class="post-body">${html}</div></article>`;
+  return layout({ title: 'About', description: 'What the CC Horror Engine is and how it is built.', body, path: '/about/', posts });
 }
 
 function feed(posts) {
@@ -228,16 +295,21 @@ mkdirSync(DIST, { recursive: true });
 cpSync(join(ROOT, 'public'), DIST, { recursive: true });
 cpSync(join(ROOT, 'static'), DIST, { recursive: true });
 
-posts.forEach((post, i) => {
-  const dir = join(DIST, 'posts', post.slug);
+const write = (path, html) => {
+  const dir = join(DIST, path);
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, 'index.html'), postPage(post, posts[i - 1], posts[i + 1]));
-});
-writeFileSync(join(DIST, 'index.html'), indexPage(posts));
-mkdirSync(join(DIST, 'about'), { recursive: true });
-writeFileSync(join(DIST, 'about', 'index.html'), aboutPage());
+  writeFileSync(join(dir, 'index.html'), html);
+};
+
+posts.forEach((post, i) => write(`/posts/${post.slug}/`, postPage(post, posts[i - 1], posts[i + 1], posts)));
+for (const page of indexPages(posts)) write(page.path, page.html);
+for (const page of labelPages(posts)) write(page.path, page.html);
+write('/about/', aboutPage(posts));
 writeFileSync(join(DIST, 'feed.xml'), feed(posts));
-writeFileSync(join(DIST, '404.html'), layout({ title: 'Not found', description: 'Page not found', body: '<section class="intro"><h1>Nothing here.</h1><p><a href="/">Back to the diary →</a></p></section>' }));
+writeFileSync(
+  join(DIST, '404.html'),
+  layout({ title: 'Not found', description: 'Page not found', body: '<div class="status-msg">Sorry, that page does not exist. <a href="/">Back to the diary</a></div>', posts })
+);
 
 for (const w of warnings) console.warn('warning:', w);
 console.log(`Built ${posts.length} posts into dist/${warnings.length ? ` with ${warnings.length} warnings` : ''}.`);

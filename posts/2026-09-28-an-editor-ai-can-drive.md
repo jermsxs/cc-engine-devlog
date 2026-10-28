@@ -1,119 +1,165 @@
 ---
-title: An editor an AI can drive
+title: An editor core without UI, a component schema and an MCP server for the editor
 date: 2026-09-28
 order: 2
-summary: I split the editor core from its UI, described every component in a schema, added an MCP server an AI agent can call, and fixed the usability bugs.
+summary: I moved editing into a UI-free EditorSession with a component schema, built an MCP server for a live or headless editor, and fixed input handling.
 tags: ai-tooling, editor, tools
-cover: /images/2026-09-28-an-editor-ai-can-drive/headless-crate.jpg
+cover: /images/2026-09-28-an-editor-ai-can-drive/live-editor-crate.jpg
 ---
 
-The measuring tools were in place. The next goal was the one in the plan's first line: an editor that an AI agent can use the way a developer does. Look at the scene, change something, take a screenshot to check, undo it if it is wrong. Three pieces of work followed. The first two made it possible, and the third made the editor nicer for people too.
+My goal for 28 September was an editor that I can use and that an AI agent can use in the same way. To be able to use it, an agent has to be able to look at a scene, change it, take a screenshot to see the result and undo the change if it is wrong. The Model Context Protocol (MCP) is the standard way for an agent to discover and call tools like that. I did this in three steps, in this order: an editing core that does not depend on the UI, an MCP server on top of it, and fixes to the editor's input handling.
 
-## Step 1: an editor core without a UI
+## Moving editing out of the UI
 
-The problem was simple. Every editing action lived inside the code of the editor window. Moving an object, adding a component, deleting an entity: all of it was tied to buttons and mouse clicks. So only a person clicking could change a scene. An agent cannot click.
+Every editing action in the editor lived in the code of the editor window, where the buttons were drawn, so only someone clicking the interface could change a scene. For a tool server, each action had to be callable without any UI and had to give the same result as it does from the UI.
 
-The fix is to separate *what an edit does* from *the button that asks for it*. I created a library called `EditorSession`. It owns the scene, the undo history, the "unsaved changes" flag and the file path. Every change goes through it as one step that is checked, limited to safe values, and undoable:
+### EditorSession
 
-- set any fields on a component;
+I created `EditorSession`, which owns the scene, the undo history, the "unsaved changes" flag and the file path. Every change goes through it as one operation that is validated, clamped to safe values and recorded as one undo step:
+
+- set any fields of an entity;
 - add or remove a component;
-- create an entity from a template (empty, box, point light, trigger volume, imported mesh, door);
+- create an entity from a template: empty, box, point light, trigger volume, imported mesh or door;
 - delete or duplicate an entity with its children;
 - move an entity under a new parent;
 - save and load.
 
-It also answers questions as JSON: describe an entity, list entities by name or component, summarise the scene, validate it. The editor window is now one client of this library. It does not have to be the only one.
-
-> **Concept: Separating the model from the view.** When logic lives inside the UI, the UI is the only way to drive it. When the logic lives in its own library and the UI only calls it, you can test the library without a window, script it from the command line, or hand it to a program that has no hands. That is the oldest idea in software architecture, and it turned out to be the whole foundation for what followed.
+It also answers questions as JSON: it describes an entity, lists entities by name or component, summarises the scene and validates it.
 
 ### One table that describes every component
 
-To let an agent edit "any field", the library has to know what the fields are. I wrote a **component schema**: one table that lists, for every component, each field's type, its sensible range, the allowed values for choice fields, its default, and how to clamp it.
+The inspector needed a hand-written section for each component type, and an agent would need the same knowledge in another form. C++ cannot list the fields of a struct at run time, so I wrote that knowledge once, as data. `ComponentSchema` is a table with one entry for each component, and each entry lists its fields.
 
-Then I used that table everywhere:
+> **Background: schema-driven editing**
+>
+> Reflection is the ability of a program to ask what fields a struct has, what their types are and how to read and write them. Without it, every feature that touches fields, such as an inspector or serialisation, repeats the list of fields by hand, and the copies drift apart. One approach is a single table that describes the fields, with each feature written against the table. Adding a field means adding one line.
 
-- the **inspector** is now generated from it. I deleted about 430 lines of hand-written inspector code, replaced by one generic field drawer. The render settings went from 6 visible controls to more than 40, and every component got **Remove** and **+ Add** buttons;
-- the **JSON form** of every component comes from it;
-- the **MCP tools** use it to check what an agent sends.
+Each field in my table records:
 
-![The inspector showing a long list of render settings, generated from the schema](/images/2026-09-28-an-editor-ai-can-drive/schema-inspector.jpg "The inspector built from the schema: exposure, fog, bloom, grain, vignette, lens distortion, grade and more, all editable.")
+- a JSON key such as `intensity` or `post.exposure`;
+- a type from a fixed set (bool, float, int, float2, float3, colour, text, enum, entity reference, string list);
+- a suggested range for the UI, the allowed values for an enum, the default, and a read-only flag;
+- a getter and a setter that work on an `EntitySnapshot`, which is a copy of all components of one entity.
 
-Adding a new field to a component is now one line in the table, and it appears in the inspector, the saved file and the agent's tools at once.
+Each component also has an `add`, a `remove` and a `sanitize` function. The sanitizer clamps values to what the engine can accept and returns notes about anything it changed. A setter does not clamp. It reports a wrong type or an unknown enum value as an error and leaves the range to the sanitizer. Edits are applied to a snapshot first, so the session can validate them and record them as an undo step before the scene is touched.
 
-The undo system got the same treatment. Twelve separate undo types, one per component, became one generic "whole entity" undo, and I removed a net 435 lines.
+The inspector, the JSON form of an entity and the MCP tools all use this table. The inspector walks the table and draws a generic widget for each field. About 430 lines of hand-written inspector code became one generic field drawer. The scene's render settings went from 6 visible controls to more than 40, because the table already listed all of them. Every component now has Remove and Add buttons, where before only colliders had them.
 
-I also fixed two bugs found while testing. Reparenting in the outliner used to make objects jump, and now keeps their world position. And "Create child" put the new entity at double the parent's offset; now it lands at the parent's origin.
+![The inspector, generated from the schema, showing a long list of render settings](/images/2026-09-28-an-editor-ai-can-drive/schema-inspector.jpg "The inspector generated from the component schema. Every render setting is editable.")
 
-## Step 2: the MCP server
+### Undo with whole-entity snapshots
 
-> **Concept: MCP.** The Model Context Protocol is a standard way for an AI assistant to discover and use tools in another program. The program publishes a list: "here are the actions I offer, here is what each one takes, here is what it returns". The assistant reads the list and calls the actions as needed. You can think of it as a menu that a program hands to an AI, written in a language both understand (the messages are JSON).
+The June editor stored undo steps as one command type for each component, with its own before and after copy. In this change I replaced twelve of those types with one: a whole-entity edit that holds the `EntitySnapshot` before and after. Undo restores the "before" snapshot and redo restores the "after" snapshot. Consecutive edits that belong together merge into one step, so that dragging a slider is one undo. The change removed a net 435 lines.
 
-I built a small server, `CCMcp.exe`, that Claude Code starts by itself from a config file in the project folder. It offers 26 tools, and nearly all of them sit directly on the `EditorSession`, so an agent's edit goes through the same checks, clamping and undo as one made with the mouse.
+![Three views of the same inspector: Exposure at 0.420, then 0.718 after a slider edit, then 0.420 again after Ctrl+Z](/images/2026-09-28-an-editor-ai-can-drive/inspector-edit-and-undo.jpg "Real mouse input on the Exposure slider, followed by Ctrl+Z.")
 
-![An agent talks to the MCP server, which edits either a running editor over a named pipe or a headless scene](/images/2026-09-28-an-editor-ai-can-drive/mcp-paths.svg "The server works in two ways, and the agent does not have to care which.")
+### Two bugs in the hierarchy
 
-It works in two modes.
+Moving an entity under a new parent made it jump, and Create Child placed the new entity at double the parent's offset. Both were mistakes about spaces. A transform is stored relative to its parent, so changing the parent without changing the stored transform moves the object in the world. The correct operation is to compute the entity's world transform first and then store `world * inverse(newParentWorld)` as the new local transform. Reparenting now keeps the world position. A new child gets the parent's origin as its position.
 
-**Live.** If the editor is running, each tool call goes to it over a *named pipe*, a private channel between two programs on the same machine. The editor runs the request between frames, on its main thread. I can watch the change happen. It shows in the outliner and the inspector, and Ctrl+Z undoes it as if I had done it.
+## An MCP server
 
-**Headless.** If no editor is open, the server loads the scene itself and renders offscreen: a new renderer mode that needs no window and never shows a frame.
+`CCMcp.exe` is a small MCP server. Claude Code starts it by itself from the `.mcp.json` file at the root of the repository. The server answers an agent's tool calls in one of two ways, shown in the diagram.
 
-The tools cover the whole loop:
+![An agent talks to CCMcp.exe over stdio. CCMcp sends the call to a running editor over a named pipe, or, when no editor runs, to a headless session](/images/2026-09-28-an-editor-ai-can-drive/mcp-paths.svg "The two paths. Both use the same EditorSession and the same schema.")
 
-- **scene:** info, load, save, validate;
-- **entities:** list, get, create, delete, duplicate, reparent;
-- **components:** add, remove, set fields, describe the schema;
-- **history:** undo, redo, run any command by name;
-- **viewing:** get or set the camera (including "look at this point"), take a screenshot, read render timings;
-- **the look:** get or set render settings;
-- **play:** run the real game for a few seconds from a chosen spot and return the last frame and the log.
+> **Background: what MCP is**
+>
+> MCP is a protocol between a client, usually an AI application, and a server that offers tools. The messages are JSON-RPC 2.0, one JSON object per line, sent over the standard input and output of the server process.
+>
+> A session starts with `initialize`. The client states the protocol version it supports, and the server answers with the version it will use and a list of its capabilities. The client then sends a `notifications/initialized` message. A notification has no `id` and gets no reply. After that the client sends `tools/list`, and the server replies with its tools. Each tool has a name, a description and a JSON Schema for its arguments, which lets the client check and explain the call. `tools/call` runs a tool by name. The result is a list of content blocks, text or image, and a flag that says whether the call failed. A failed tool call is a normal result with the flag set, so the agent can read the message and correct itself. Problems in the protocol itself use the standard JSON-RPC error codes: -32700 for a message that cannot be parsed, -32600 for an invalid request, -32601 for an unknown method and -32602 for invalid parameters.
 
-Screenshots come back as images the agent can look at, as small JPEGs by default with a lossless PNG saved to disk. In the live editor, the capture is taken right after post-processing and before the editor UI is drawn, so it shows only the scene.
+My server implements `initialize` with version negotiation, `ping`, `tools/list` and `tools/call`, answers the empty lists for resources and prompts, and ignores notifications. It has 26 tools:
 
-Here is headless mode. With no editor open, the agent created a box, gave it a wood colour, pointed the camera at it and took this picture. The flat look is the plain, unlit box. That is exactly what the lighting work is going to fix.
+- **Scene:** info, load, save, validate.
+- **Entities:** list, get, create, delete, duplicate, reparent.
+- **Components and fields:** add or remove a component, set any fields, describe the schema.
+- **History and commands:** undo, redo, and any command-palette command by name.
+- **Viewing:** get or set the camera, including a "look at this point" form, take a screenshot, and read the render timings.
+- **Other:** list assets, get or set the look (the render settings) and select entities in the editor.
+- **`game_capture`:** runs the real game briefly from a chosen spawn point and returns the final frame, any warnings and the end of the game's log.
 
-![A plain tan box on the dark hallway floor between two walls](/images/2026-09-28-an-editor-ai-can-drive/headless-crate.jpg "Headless: one box created, recoloured and photographed with four tool calls and no editor open.")
+Almost every tool is a thin layer over `EditorSession` and the schema, so an agent's edit gets the same validation and undo as an edit from the inspector.
 
-And here are the same edits made live. The crate is selected, the inspector shows its transform, and the status line reads that the change came from MCP:
+### Live mode and the named pipe
 
-![The editor with the crate selected, its move gizmo visible, and the status line mentioning an MCP edit](/images/2026-09-28-an-editor-ai-can-drive/live-editor-crate.jpg "Live: the agent's changes appear in the running editor, in the same undo history as mine.")
+When the editor is running, each tool call goes to it. The two programs run in different processes, so they need a way to talk. I used a named pipe.
 
-## How I tested it
+> **Background: named pipes**
+>
+> A named pipe is a Windows mechanism for communication between processes on one machine. One process creates the pipe under a name such as `\\.\pipe\cc_editor` and waits. Another opens that name the way it would open a file, and from then on both can read and write a stream of bytes. A pipe is local, it can be limited to one user, and it has no network port to open. Only one process can own a given name, so a second editor that tries to create the same pipe fails, which is the behaviour I want.
 
-The tool host has tests for: every tool having a valid input schema, create-edit-undo by name, the error cases (missing entities, bad values, absolute or `..` paths, edits blocked during play), the named-pipe round trip (including refusing a second server on the same pipe), and the protocol itself, with the right error codes. The validation script now runs a headless smoke test as well: scene info, a look change, an undo, and a small screenshot.
+The editor creates the pipe and starts a background thread that accepts a client and reads one line of JSON per request. The thread does not touch the scene. It places each request in a queue. The editor's main loop calls `Poll` once per frame, between frames, and runs every queued request on the main thread. This matters because the scene is not thread-safe. If the pipe thread edited it while the UI was drawing it, the result would be a crash or a corrupt scene. Running requests between frames on the main thread means tool edits can never race with the UI.
 
-I also drove it by hand, and pressed Ctrl+Z with real keyboard input to confirm it removed the crate the agent had added.
+In live mode I can watch an agent work. The change appears in the viewport, the outliner and the inspector, the status line says that an MCP edit was made, and Ctrl+Z undoes it like any other edit, because the edit is in the same history.
 
-A few limits are honest to mention. In live mode, a screenshot is the viewport at its current size, so only headless mode can render at a chosen resolution. Only one client can use the pipe at a time. The "play" tool opens a visible game window for a few seconds. And I had not yet checked that a fresh Claude Code session picks up the server on its own. The protocol is covered by tests, and the next session would be the real check.
+### Headless mode and offscreen rendering
 
-## Step 3: the editor stops fighting you
+When no editor is running, `CCMcp` loads the startup scene itself, creates an `EditorSession` and renders screenshots without a window.
 
-With an agent using the editor and me using it too, I kept hitting small annoyances that made the editor feel hostile. A day of fixing them made it nicer for everyone.
+> **Background: offscreen rendering**
+>
+> A window is needed to show an image, but not to create one. Direct3D 12 can render into any texture, and the window is needed only for the swap chain, the set of back buffers that the display presents. An offscreen renderer skips the swap chain. It creates its own colour target at a chosen size, draws into it, copies it to a buffer that the CPU can read and encodes that as an image. It never presents a frame.
 
-**Typing triggered shortcuts.** Typing "lamp f" into the outliner's search box toggled the flashlight (the L key) and moved the camera (F). Now the UI reports when a text field, a slider edit or the command palette owns the keyboard. While it does, only Ctrl and Alt combinations count as shortcuts.
+I added an offscreen mode to the renderer, `InitializeOffscreen`, for this. In headless mode a screenshot can have a size that I choose. An offscreen frame at 720p took 1.94 ms of GPU time in a Debug build.
 
-**Fast typing dropped letters.** The window kept only the last character per frame. It now keeps all of them, in order, backspaces included.
+### Screenshots, so that the agent can see
 
-**You can type exact numbers.** Ctrl+click any slider, type a value, press Enter. You can go outside the slider's range if you want; the component's own limits still apply.
+A screenshot comes back from a tool as an image that the agent can look at. The default is JPEG, to keep the size small, and a lossless PNG is also saved to `Saved/Mcp/`. In live mode the capture is taken right after post-processing and before the editor UI is drawn, so it shows only the scene. The option `include_ui` captures the whole window instead.
 
-**Clicks belong to the editor.** The mouse buttons were being read from the system-wide state, so a click in another window could register in the editor. They now come from the editor window's own messages. The click that only brings the window to the front does not select anything. Clicking the command palette or a menu no longer reaches the panels behind it.
+![A plain tan box on the hallway floor between two walls, rendered headlessly](/images/2026-09-28-an-editor-ai-can-drive/headless-crate.jpg "Headless, with no editor open. entity_create placed a box, field_set gave it a wood colour, camera_set with look_at aimed the camera and render_screenshot returned this frame.")
 
-**A command palette you can drive with the keyboard.** Ctrl+P opens it with the filter ready. Up and Down choose, Enter runs, Esc closes. Each typed word is matched separately and results are ranked, so "view t" puts "Viewport Camera: Top" first. Before, "view top" found nothing.
+![The editor with the crate selected and the status line reporting an MCP edit](/images/2026-09-28-an-editor-ai-can-drive/live-editor-crate.jpg "Live mode. The same calls went to the running editor. The crate is selected, the inspector shows its transform and the status line reports an MCP edit.")
 
-![The command palette open over the viewport, listing results with Viewport Camera: Top highlighted first](/images/2026-09-28-an-editor-ai-can-drive/palette.jpg "Ctrl+P, then 'view t': the best match is first, and Enter runs it.")
+The plain box looks flat because the lighting is still the old lighting. That is the work of the next track.
 
-**A Create menu, and drag-to-place.** A new Create button adds an empty entity, a box, a point light, a trigger volume or a door, placed on the floor at the centre of your view and selected, all as one undo step. You can also drag a glTF file from the Assets panel into the viewport. It lands on the floor where you drop it, and near a wall it steps back into the room rather than sinking into the wall.
+![The editor after Ctrl+Z pressed twice, with the crate gone and the profiler panel showing two steps available to redo](/images/2026-09-28-an-editor-ai-can-drive/live-editor-ctrl-z.jpg "Ctrl+Z pressed twice in the editor removed the crate. The agent's edits are in the same undo history as mine, and the panel shows two steps available to redo.")
 
-![A door leaf dropped into the hallway, selected, with its position shown in the inspector](/images/2026-09-28-an-editor-ai-can-drive/placed.jpg "A door leaf dragged in from the Assets panel and standing on the floor.")
+### How I checked it
 
-**Rebuilding while an agent is connected.** With Claude Code running the server, every full build failed because the linker could not overwrite a running program. Windows does let you *rename* a running program, so a build step now moves the old file aside first. The server keeps running, and I reconnect it when I want the new build.
+- The suite ran 36 of 36 tests. The new `EditorToolHostTests` check that every tool has a valid input schema, create, edit and undo by name, the error cases (missing entities, bad patches, absolute paths and `..` in paths, edits while the game is in play preview), a real named-pipe round trip including the refusal of a second server on the same pipe, and the protocol itself, with tool errors returned as results and the correct JSON-RPC error codes.
+- `Validate-Engine.ps1` passed. It now includes a headless smoke test that calls `scene_info`, `look_set`, `history_undo` and takes a 640 by 360 screenshot.
+- By hand, through `Scripts/Invoke-Mcp.ps1`, which calls the same tools from PowerShell, I did headless edits, camera moves, look changes, undo and render stats, and live creation, field edits, selection and screenshots in the running editor, followed by Ctrl+Z pressed with real keyboard input.
 
-## What went wrong on the way
+### Known limits
 
-Three bugs were worth the story. My first typed-number version appended the new digits to the current value, so I got "0.420.55" instead of 0.55. A mesh dropped near a wall landed inside the baseboard. And my first command-palette ranking put "Toggle Viewport Grid" as high as the top view for "view t", until I made matches in the typed order score higher.
+In live mode a screenshot is the viewport at its current size, and only headless mode can render at a chosen resolution. The pipe serves one client at a time. `game_capture` opens a visible game window for a few seconds. I had not yet checked that a fresh Claude Code session picks up the server. Tests and `Invoke-Mcp.ps1` covered the handshake.
 
-## Where it stood
+## Making the editor usable
 
-The whole path now works. An agent can look at the scene, change it, see the result and undo it, and every edit shares one history with mine. All 36 tests passed. The honest summary is that this is tooling, not an image, and the best proof is that I used it directly, through the new tools, for the checks in the usability work.
+With tool access working, I went back to the editor's own input, and I used the MCP tools to check each fix in the running editor.
 
-Next was the graphics work. It starts with trimming the renderer's waste, one measured change at a time.
+### Shortcuts that fired while typing
+
+Typing "lamp f" into the outliner search toggled the flashlight, with L, and moved the camera, with F. Delete, W, E or R could fire in the middle of a word. The UI now reports whether a text field, a slider edit or the command palette has the keyboard. While one does, only chords with Ctrl or Alt count as shortcuts.
+
+### Typed characters that were dropped
+
+The input state in the June UI library held a single typed character per frame, so fast typing lost letters. The window now keeps every character in order, backspaces included.
+### Typing exact numbers into sliders
+
+Ctrl+click on a slider opens it for typing. The first key replaces the shown value, Esc cancels, and a click elsewhere applies it. Values outside the slider's range are accepted, and the component's own limits then clamp them. A first version appended the digits to the current value, giving "0.420.55". I fixed it so that the first key replaces the value.
+
+### Clicks that belong to the editor
+
+Mouse buttons were read from the global mouse state, so a click in another window could register in the editor. They now come from the editor window's own messages. A click on the command palette or the Create menu no longer reaches the panels behind it.
+
+### A command palette for the keyboard
+
+Ctrl+P opens the palette with its filter focused. Up and Down choose a command, Enter runs it, and Esc closes it. Each typed word is matched separately and the results are ranked, so "view t" puts Viewport Camera: Top first. Before, "view top" found nothing. My first ranking scored "Toggle Viewport Grid" as high as the top view for "view t", so matches in the typed order now score higher.
+
+![The command palette open over the viewport, with Viewport Camera: Top highlighted first for the filter "view t"](/images/2026-09-28-an-editor-ai-can-drive/palette.jpg "Ctrl+P, then 'view t'. The filter is focused straight away and the best match is first.")
+
+### Creating and placing things
+
+The Create menu makes an empty entity, a box, a point light, a trigger volume, a door, or the glTF selected in the Assets panel. The new entity lands on the floor at the centre of the view and is one undo step. A `.gltf` dragged from the Assets panel into the viewport is placed on the floor where it is dropped, and a mesh dropped next to a wall steps back into the room, because it first landed inside the baseboard. `CCEditor --scene=path` opens a scene and Ctrl+S saves back to it.
+
+### Rebuilding while a server is running
+
+While Claude Code ran `CCMcp.exe`, every full build failed, because the linker could not overwrite the running executable. Windows does not allow a running executable to be overwritten, but it does allow it to be renamed. A pre-link step now renames the old executable out of the way, and the server keeps running. The server has to be reconnected to pick up a new build.
+
+I checked these in the running editor with real mouse and keyboard input and read the results back through the MCP tools. "lamp f" in the outliner search left the flashlight and the camera alone, and Ctrl+click on Exposure, typing 0.55 and Enter gave exactly 0.55, with Ctrl+Z restoring 0.42. The UI tests gained a keyboard test, a diagnostics test covers the palette matching, and the suite reached 36 of 36.
+
+## Results and what comes next
+
+The editor now works through one core that does not depend on the UI, and an agent or a script can do everything that a person can do in the editor, with the same checks and the same undo. The next track is the renderer. Its first step is a list of clean-ups that must not change the picture, such as shared constant-buffer layouts, back-face culling and frustum culling, and each one will be measured with the benchmark from the previous post.

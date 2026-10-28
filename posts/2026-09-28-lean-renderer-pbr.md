@@ -1,31 +1,39 @@
 ---
-title: A leaner renderer and one honest lighting model
+title: A leaner renderer and one physically based lighting model
 date: 2026-09-28
 order: 3
-summary: I cut about 45% of the GPU time with no visible change, then replaced my hallway-specific shader hacks with physically based lighting that works for any room.
+summary: I cut GPU time by about 45% with no visible change, then replaced the hallway-specific shader code with one GGX lighting model.
 tags: renderer, lighting, performance
 cover: /images/2026-09-28-lean-renderer-pbr/closet-door.jpg
 ---
 
-By this point the engine could already draw a convincing dark hallway. The trouble was how it did it. The scene shader knew it was drawing *that* hallway. It had the corridor's coordinates baked in, painted fake reflection streaks onto the floor and faked pools of lamp light on the walls. It looked fine from the angles I had tuned for and would fall apart in any other room.
+By 28 September the engine drew a convincing dark hallway, but the scene shader knew which hallway it was drawing. It contained the corridor's coordinates, its floor and ceiling heights, reflection streaks painted onto the floor, lamp pools painted onto the walls, contact darkness at known seams and a hand-built flashlight. The result looked right from the angles I had tuned and would not work in any other room. The editor I am building has to light any room, so the shader had to stop depending on this one.
 
-I'm aiming for the look of Resident Evil 7 and Village, and I want to get there with a renderer that is both fast and honest. So I started a new stretch of work in two parts. First, make the renderer lean without changing the picture. Second, throw out the hacks and light everything with one physically based model.
+I started a block of work toward the Resident Evil 7 and Village look, with a budget of about 11 ms per frame at 1440p on an RTX 3060-class GPU. It had two steps. The first made the renderer cheaper without changing the picture. The second removed the hallway-specific code and lit every surface with one physically based model.
 
-## Making the renderer lean
+## Measuring first
 
-You can't optimise what you can't measure, so the first job was a benchmark I could trust. Film grain and the flashlight flicker both read the clock, which meant two runs of the same build never produced the same image. I made the benchmark freeze time. Now two runs match pixel for pixel, and timings repeat within about 1%. After that, every change was checked against the one before it.
+Film grain and the flashlight flicker both read the clock, so two runs of the same build never produced the same image. I changed the benchmark to freeze shader time. Two runs of one build now match pixel for pixel, and timings repeat within about 1%. Every change below was compared against the previous commit for GPU time and for pixel differences. The numbers in this post come from a Debug build on an RTX 4070 at 1440p, rendering six fixed camera poses.
 
-Here is what came out, roughly in order of payoff.
+## Where the time went
 
-**Back-face culling.** A triangle has a front and a back. Every triangle was being drawn from both sides, even though the back of a wall facing away from you is never visible. Worse, the old shader threw away some floor and wall pixels with a `discard` instruction, and a shader that can discard switches off the GPU's *early depth test*, the trick where a pixel is rejected before the expensive shading runs. Those discards turned out to depend only on which face was being drawn, so the CPU now simply skips those faces. Opaque draws cull back faces, and only a separate alpha-tested pipeline is allowed to discard. This was the single biggest win, making the main scene pass 28 to 50% faster.
+The cost of a forward renderer is roughly the vertices it transforms plus the pixels it shades, and the pixel shader here was the expensive part. Most of the gain came from shading fewer pixels and submitting less geometry.
 
-**Frustum culling.** Each object has a bounding box. If that box is entirely outside the camera's view volume (the *frustum*), there's no point sending the object to the GPU. At the starting pose, 25 of 70 objects are drawn. Shadow casters get the same test against the light's view.
+> **Background: Culling and the depth test.** A triangle has a front and a back, decided by the winding order of its vertices on screen. The back faces of a closed mesh point away from the camera and are always covered by front faces, so rasterising them wastes work. *Back-face culling* drops them before shading. *Frustum culling* works on whole objects: each object's bounding box is tested against the six planes of the camera's view volume, and an object entirely outside is never submitted. Last, the GPU can run the *early depth test*: if a nearer surface is already stored at a pixel, the new fragment is rejected before its pixel shader runs. That only works if the shader cannot change the outcome. A shader containing `discard` may throw the pixel away, so the hardware cannot write depth early and the optimisation is lost for everything drawn with that shader.
 
-**A depth prepass.** The roadmap said to add one only if it measured faster, and it did. The idea is to draw all opaque geometry once with a trivial depth-only shader. Then, when the expensive lighting shader runs, the GPU already knows the nearest surface at every pixel and shades each pixel exactly once. Overdraw (shading something that a wall then covers) goes away. It bought another 3 to 26%, mostly in the long corridor views where lots of surfaces line up behind each other.
+**Back-face culling.** Every triangle was being drawn from both sides. The old shader also discarded some floor and wall faces per pixel, which disabled the early depth test for all of them. Those discards depended only on which face was being drawn, so the CPU now skips those faces instead, and the picture stays identical. Opaque draws cull back faces. Double-sided glTF materials and mirrored objects use a separate two-sided pipeline, and a separate alpha-tested pipeline is the only one that may discard. This was the largest single gain: the scene pass became 28 to 50% faster.
 
-**Less bookkeeping.** Each frame the renderer was looking up meshes by name, sometimes two or three times per object, and building a list with a quadratic search. Names are now turned into small numbers once, when the scene changes. Material and buffer binds are skipped when nothing has changed. The shadow map is only redrawn when a light or a shadow caster moves.
+**Frustum culling.** At the starting pose, 25 of the 70 objects are drawn. Shadow casters get the same test against each light's frustum. The counts appear in the window title, the editor's Profile panel and the MCP `render_stats` tool.
 
-Two smaller fixes are worth a mention. A constant-buffer ring used to silently drop objects past 512 of them. It now waits for the GPU, grows, and logs a warning. And the "Light Scale" slider turned out to do nothing, because the value reached the shader but was only used in a check that never tripped. The demo had been tuned at 0.06 while that was true, so I changed it to 1.0, which gives exactly the same picture.
+**A depth prepass.** In a forward renderer a pixel can be shaded several times: a far wall is shaded, then a nearer door is drawn over it. This is overdraw. A depth prepass draws all opaque geometry once with a vertex shader only, which fills the depth buffer. The lighting pass then runs with the depth known, and each visible pixel is shaded once. The cost is submitting the geometry twice, and the prepass has to use the same vertex shader as the main pass so the depths match exactly. The roadmap said to add it only if it measured faster. It did, by another 3 to 26%, mostly in the long corridor views where many surfaces line up behind each other.
+
+The remaining changes were smaller:
+
+- Mesh names are turned into small integer handles once, when the scene changes. The renderer had been building a list with a quadratic search and looking up each object's mesh by name two or three times a frame.
+- A material or buffer bind is skipped when nothing changed.
+- The shadow map is redrawn only when a light or a shadow caster moves.
+- The per-object constant buffer ring used to drop objects past 512 without a message. It now waits for the GPU, grows and logs a warning.
+- The "Light Scale" slider did nothing, because the value reached the shader but only inside a check that never passed. I had tuned the demo at 0.06 while that was true, so I set the scene to 1.0, which gives the same picture. The engine now multiplies every lamp by it.
 
 ![Light Scale at 1.0 and at 0.4](/images/2026-09-28-lean-renderer-pbr/light-scale.jpg "Light Scale 1.0 on the left, 0.4 on the right. Before the fix, both looked like the left one.")
 
@@ -36,52 +44,114 @@ Two smaller fixes are worth a mention. A constant-buffer ring used to silently d
 | north_corridor_long | 5.87 ms | 2.98 ms (−49%) |
 | north_locked_door | 5.02 ms | 2.78 ms (−45%) |
 
-Those are Debug-build numbers on an RTX 4070 at 1440p. The picture barely changed: at most 196 of 3.6 million pixels differed per pose, all at seams where two faces share a plane and the depth test picks a winner. I turned culling off again to confirm that was the cause, and the image matched exactly.
+The picture changed very little. At most 196 of 3.7 million pixels differ per pose, all at seams where two coplanar faces tie in depth and the later one now wins. I confirmed that by turning culling off again: the images then matched exactly.
 
-> **Note: Why the benchmark came first.** Optimising by eye is how you "speed up" a renderer by breaking it. A frozen-time benchmark that can say "0 pixels differ" turns each change into a small, checkable claim, and every step in this post was held to it.
+## How physically based shading works
 
-## One lighting model for everything
+After the culling work, the scene shader was still the old one. To replace it I needed a model that behaves correctly for any light and any material. This section covers the theory, then my implementation.
 
-With the renderer lean, I had room to replace the hacks. The goal: lights, materials and the camera make the image, and the shader knows nothing about hallways.
+### Light leaving a surface
 
-> **Theory: What a BRDF is.** When light hits a surface, some of it bounces off, and *how much goes in which direction* depends on the surface. A *BRDF* (bidirectional reflectance distribution function) is a formula that answers: for light arriving from this direction, how much leaves toward the viewer? Every PBR renderer is, at heart, one BRDF evaluated for each light at each pixel.
+For each pixel the renderer computes radiance: the light travelling from the surface point toward the eye. The rendering equation describes it in words as the light the surface emits, plus, summed over every direction `l` in the hemisphere above the surface, the radiance arriving from `l` times the surface's reflectance for that pair of directions times the cosine of the angle between `l` and the normal `n`.
 
-The BRDF I used is the standard real-time one. It splits reflected light into two parts.
+```
+Lo(v) = Le(v) + ∫ f(l, v) · Li(l) · (n·l) dl
+```
 
-**Diffuse** is light that goes into the material, scatters around and comes back out in all directions, so the surface looks the same from any angle. Matte plaster is mostly diffuse. I use the simple Lambert model: brightness follows the angle between the surface and the light.
+The cosine term exists because light arriving at a grazing angle is spread over a larger area of surface. A point light or spot light arrives from a single direction, so the integral reduces to a sum with one term per light. For each light I compute how much light arrives (intensity, falloff, cone, shadow) and evaluate the reflectance function `f` once. The forward pass is that loop.
 
-**Specular** is light that bounces straight off the top surface, like a mirror but blurred. The blur is controlled by *roughness*. A glossy floor has a tight, bright highlight, and rough plaster has a wide, dim one. I use the **GGX** distribution to describe how the tiny microscopic facets on the surface are oriented. It gives a sharp core and a long soft tail, which is what real highlights look like. Two other terms complete the specular part: *Smith masking*, which accounts for facets hiding each other, and *Fresnel*.
+### The BRDF
 
-**Fresnel** is the observation that every surface becomes more mirror-like at grazing angles. Look straight down at a wooden floor and you see wood. Look along it, toward the far end of a hallway, and you see the lamps reflected. Schlick's approximation captures this cheaply, and it matters a lot in a long corridor.
+`f` is the bidirectional reflectance distribution function (BRDF). For light arriving from direction `l`, it gives the share that leaves toward direction `v`. A plausible BRDF obeys two rules. Reciprocity means swapping `l` and `v` gives the same value. Energy conservation means the integral of `f · (n·l)` over all `l` is at most 1, because a surface cannot return more light than it receives. My tests check both.
 
-**Metalness** decides what colour the specular reflection is. A plastic or painted surface reflects white-ish light, at around 4% strength head-on. A metal reflects light tinted by its own colour and has almost no diffuse part. The demo has few metals, such as the lamp fittings and door knobs, but the same formula covers them.
+I split `f` into a diffuse part and a specular part.
 
-> **Concept: Energy conservation.** A surface can't send out more light than it receives. In a PBR model, light that was reflected by the specular part is no longer available to be scattered by the diffuse part. This is what stops a white wall from glowing brighter than the lamp shining on it.
+**Diffuse** light enters the material, scatters and leaves in an effectively random direction, so the surface looks the same from every angle. I use the Lambert model, `albedo / π`. The `π` normalises it: the cosine-weighted integral of a constant over the hemisphere is `π`, so an albedo of 1 returns exactly the light that arrived.
 
-I wrote the BRDF once in HLSL and once in C++, so I could test it. One test is a "white furnace": integrate the highlight over the whole hemisphere and check that a surface never reflects more than it receives. That test caught something. The textbook way of dimming the diffuse part, multiplying by `1 − F` per light, let a white wall reflect up to 128% of the light at grazing angles. I now weight the diffuse by what the highlight *doesn't* take for that view angle. The worst case is 105%, which is the error of the approximation itself. Without the test I would never have seen it.
+**Specular** light bounces off the surface itself. At microscopic scale even a smooth-looking surface is made of tiny facets, each a perfect mirror. A facet reflects light from `l` toward `v` only if its normal points along the half vector `h`, the normalised sum of `l` and `v`.
 
-## Lights that behave like lights
+![The vectors n, l, v and h at a surface made of microscopic facets](/images/2026-09-28-lean-renderer-pbr/microfacet.svg "Only the facets whose normal equals the half vector h send light from l toward v.")
 
-Brightness now falls with the square of the distance, and fades smoothly to zero at the light's range so it can be cut off without a visible edge. Lights can be spot lights with inner and outer cone angles. The flashlight is simply a spot light in the same loop as the lamps, with no special code.
+The standard microfacet form, due to Cook and Torrance, multiplies three terms:
 
-The GPU receives up to 64 lights per frame. For each object, the CPU picks the 8 that matter most: the brightest at that object's nearest point, with the flashlight always included. To stop lights popping in and out as you walk, a light keeps its slot unless a newcomer is at least 10% stronger.
+```
+f_spec = D(h) · F(v, h) · G(l, v) / (4 (n·l) (n·v))
+```
 
-Walls and floors became ordinary library materials too, going through the same path as the glTF door and lamp. And I deleted a lot of code: the scene shader dropped from 886 lines to about 250, with around 20 hallway-specific functions gone. Eight settings that no longer did anything were retired, and old scene files still load with a one-line note.
+- **D, the normal distribution**, is the share of facets whose normal is `h`. A rough surface has facets pointing in many directions, so `D` is wide and low. A smooth surface has a narrow, tall `D`.
+- **F, Fresnel**, is the share of light reflected instead of absorbed, and it depends on the angle.
+- **G, geometry**, is the share of those facets that are actually visible to both the eye and the light, rather than hidden behind neighbouring facets.
 
-![The hallway before and after physically based lighting, six poses](/images/2026-09-28-lean-renderer-pbr/pbr-bench-after.jpg "After the switch to physically based lighting: the plaster and wood read at last, and the lamps make real pools of light.")
+**GGX** is the `D` I use:
 
-## What went wrong
+```
+D(h) = α² / ( π · ((n·h)² (α² − 1) + 1)² )     with α = roughness²
+```
 
-Making walls cast shadows exposed real problems. A lamp's own wall darkened in hard wedges, because the wall was shadowing its own lit side. The fix was to draw back faces into the shadow map, so a wall can't shadow the side facing the light.
+Squaring the artist-facing roughness spreads the visible change evenly across the slider. What matters about GGX is its shape. It has a sharp core and a long, slowly falling tail, which matches measured highlights better than a Gaussian-like lobe. A lamp reflected in a glossy floor shows a bright centre inside a wide faint halo. I clamp roughness to 0.045 so the highlight never collapses to a single-pixel spike.
+
+**Schlick's approximation** gives Fresnel cheaply:
+
+```
+F = F0 + (1 − F0) · (1 − v·h)^5
+```
+
+`F0` is the reflectance when looking straight at the surface. Every material tends toward full reflectance at grazing angles. Looking down at a wooden floor shows wood, and looking along it toward the far end of a hallway shows the lamps. In a long corridor that effect is large.
+
+**Smith's `G`** accounts for facets masking each other. I use the height-correlated form, and I fold the `4 (n·l)(n·v)` denominator into it as a single visibility term, so the code evaluates `D · V · F`.
+
+**Metalness** decides what colour the specular reflection has. Paint, plaster and wood are dielectrics: they reflect about 4% of light, untinted (`F0 ≈ 0.04`), and the rest becomes diffuse. A metal has no diffuse part, because the light that enters is absorbed, and it reflects with `F0` equal to its own colour. A material stores a metalness value, and the shader blends:
+
+```
+f0           = lerp(0.04, baseColor, metallic);
+diffuseColor = baseColor * (1.0 - metallic);
+```
+
+The hallway has few metal parts, the lamp fittings and door knobs, but the same two lines cover them.
+
+### Energy conservation in practice
+
+Diffuse and specular share one budget of incoming light, and light the specular lobe reflects is not available to the diffuse lobe. A common approximation scales the diffuse term by `1 − F` for each light.
+
+I wrote the BRDF once in HLSL and once in C++ so that I could test it. One test is a white furnace: a surface sits in a uniform environment of radiance 1, and the integrated reflection must not exceed 1 for any view angle. It uses GGX importance sampling to integrate the specular lobe. The test showed that the `1 − F` weighting let a white dielectric reflect up to 128% of the light it received at grazing angles. That factor describes one light direction, while the diffuse term has to leave room for the specular lobe's total reflectance at the current view angle. I now weight the diffuse term by `1 − EnvBRDF(F0, roughness, n·v)`, where `EnvBRDF` is Karis's analytic fit of the lobe's total directional reflectance. The worst case is now 105%, which is the error of the fit itself. I would not have found this without the test.
+
+### Lights
+
+Brightness follows the inverse square law, because a light's energy spreads over the surface of a sphere whose area grows with `d²`. I use a windowed form:
+
+```
+attenuation = saturate(1 − (d / range)^4)² / max(d², radius²)
+```
+
+The window forces the light to exactly zero at its range, so it has a finite reach with no visible edge. This is what allows a per-object light list and a finite shadow far plane. The `max` with the bulb radius stops the result going to infinity next to the lamp. Spot lights multiply by a smooth cone between an inner and an outer angle. A light with a physical radius also widens the highlight, by adding `radius / (2d)` to `α`, so a small bulb on a smooth floor stays a highlight instead of flickering as a one-pixel speck.
+
+Up to 64 lights go to the GPU each frame. For each object the CPU chooses the 8 that matter most, ranked by brightness at the object's nearest point, with the flashlight always included. A light keeps its slot unless a newcomer is at least 10% stronger, so lights do not flicker in and out as the camera moves. The flashlight is an ordinary spot light in the same loop as the lamps. The ambient term is a two-colour hemisphere, sky for upward-facing normals and ground for downward-facing, run through the same diffuse and specular split, as a stand-in until baked indirect light exists.
+
+## What I removed
+
+Floors and walls became ordinary library materials. The Wood051 and Plaster004 textures now go through the same path as the glTF door and lamp, and box faces without authored UVs project the texture from the world axis they face. The scene shader went from 886 lines to about 250, and about 20 hallway-specific functions are gone. Eight render settings and the per-object `materialTuning` component no longer did anything and were retired. Old scene files still load, with a one-line log note, and saving drops the old keys. A shader test now fails if the retired hallway terms come back.
+
+## A shadow problem the new model exposed
+
+Once walls could cast shadows, the wall around each lamp darkened in a hard wedge. The wall was shadowing its own lit side: its front face sat at almost exactly the depth stored in the shadow map. I fixed it by drawing back faces into the shadow map. A wall is a closed box, so its back face lies 8 cm behind the lit face, and the lit surface now passes the depth comparison. The next post covers shadow maps in detail.
 
 ![A hard shadow wedge on the wall, and the same wall fixed](/images/2026-09-28-lean-renderer-pbr/shadow-wedge.jpg "Left: the lamp's own wall shadowing itself in a wedge. Right: the fixed, smooth pool.")
 
-I'll be honest about the interim look as well. With the painted tricks gone, the floor lost its fake gloss and the space between the lamps went flat and very dark. That was expected. Real shadows, ambient occlusion and screen-space reflections were next, and they are what fill that gap properly.
+## Results
 
-## Where it ended up
+![The six hallway poses before the physically based shader](/images/2026-09-28-lean-renderer-pbr/lean-bench-after.jpg "The six bench poses with the hand-tuned shader, after the lean-out work: a flat flashlight disc and painted-on effects.")
 
-The main scene pass dropped from roughly 2.5 ms to about 0.4 ms at the start pose, because the new shader is so much simpler than the old pile of special cases. The wall plaster's relief now shows under raking lamp light, the lamps cast believable pools, and the flashlight behaves like a light.
+![The same poses after the physically based shader](/images/2026-09-28-lean-renderer-pbr/pbr-bench-after.jpg "After the switch: the plaster and wood read, and the lamps make real pools of light.")
+
+| Pose | GPU frame before | after | Scene pass before | after |
+|---|---|---|---|---|
+| south_start | 2.87 ms | 0.70 ms | 2.56 ms | 0.38 ms |
+| east_closet_door | 2.94 ms | 0.66 ms | 2.63 ms | 0.35 ms |
+| north_corridor_long | 2.95 ms | 0.68 ms | 2.63 ms | 0.36 ms |
+| north_locked_door | 2.76 ms | 0.61 ms | 2.44 ms | 0.28 ms |
+
+Together with the lean-out work, the start pose went from 5.93 ms to 0.70 ms. The forward pass now sits well inside its 2.5 ms budget on this card, which leaves room for shadows, ambient occlusion, reflections and fog. Every commit meant to keep the image unchanged was pixel-identical on the benchmark.
 
 ![A wall lamp grazing the plaster beside a closet door](/images/2026-09-28-lean-renderer-pbr/closet-door.jpg "Lamp light skimming the plaster brings out its relief, while the door and frame sit in the gloom.")
 
-All that leftover time is the point. It's headroom for shadows, ambient occlusion, reflections, fog and the camera effects I'm about to build.
+The picture is not finished. With the painted tricks gone, the floor lost its fake gloss, and the space between the lamps is flat and very dark. That was expected. Real shadows, ambient occlusion and reflections are the next steps, and the sconce glass still produces blocky bloom squares that the camera work has to address.

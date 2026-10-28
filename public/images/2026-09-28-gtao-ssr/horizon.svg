@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c8c8c8"/></marker>
+    <marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d9c591"/></marker>
+  </defs>
+  <rect x="520" y="110" width="140" height="170" fill="#161616" stroke="#c8c8c8" stroke-width="2"/>
+  <line x1="60" y1="280" x2="520" y2="280" stroke="#c8c8c8" stroke-width="2"/>
+  <path d="M360,280 L240,280 A120,120 0 0 1 447.6,197.9 Z" fill="#d9c591" fill-opacity="0.18" stroke="none"/>
+  <path d="M240,280 A120,120 0 0 1 447.6,197.9" fill="none" stroke="#d9c591" stroke-width="2"/>
+  <line x1="360" y1="280" x2="520" y2="130" stroke="#d9c591" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <line x1="360" y1="280" x2="120" y2="280" stroke="#d9c591" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <line x1="360" y1="280" x2="360" y2="150" stroke="#c8c8c8" stroke-width="2" marker-end="url(#ah)"/>
+  <circle cx="360" cy="280" r="5" fill="#d9c591"/>
+  <text x="368" y="152" fill="#c8c8c8" font-style="italic" font-size="18">n</text>
+  <text x="330" y="236" fill="#d9c591" text-anchor="middle" font-size="14">open</text>
+  <text x="470" y="262" fill="#8a8a84" text-anchor="middle" font-size="14">blocked</text>
+  <text x="150" y="268" fill="#d9c591" text-anchor="middle" font-style="italic" font-size="16">h1</text>
+  <text x="476" y="158" fill="#d9c591" font-style="italic" font-size="16" text-anchor="end">h2</text>
+  <text x="360" y="304" fill="#c8c8c8" text-anchor="middle" font-size="14">surface point</text>
+  <text x="590" y="200" fill="#8a8a84" text-anchor="middle" font-size="14">wall</text>
+  <text x="40" y="332" fill="#c8c8c8" font-size="14">One slice through the depth buffer. Each horizon is the highest surface seen from the point on that side.</text>
+  <text x="40" y="352" fill="#d9c591" font-size="14">The ambient light that reaches the point arrives through the open sector between h1 and h2.</text>
+</svg>

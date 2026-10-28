@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="Georgia, serif" font-size="15">
+<rect width="720" height="360" fill="#0b0b0b"/>
+<rect x="30" y="45" width="660" height="255" fill="none" stroke="#c8c8c8" stroke-width="1.5"/>
+<text x="46" y="68" fill="#8a8a84">one process</text>
+<rect x="50" y="90" width="200" height="190" fill="none" stroke="#c8c8c8" stroke-width="2"/>
+<text x="150" y="116" fill="#d9c591" text-anchor="middle">C++ engine</text>
+<text x="150" y="148" fill="#c8c8c8" text-anchor="middle">loads hostfxr at run time</text>
+<text x="150" y="172" fill="#c8c8c8" text-anchor="middle">keeps the NativeApi table</text>
+<text x="150" y="196" fill="#c8c8c8" text-anchor="middle">of C function pointers</text>
+<text x="150" y="220" fill="#c8c8c8" text-anchor="middle">catches C++ exceptions</text>
+<rect x="470" y="90" width="200" height="190" fill="none" stroke="#c8c8c8" stroke-width="2"/>
+<text x="570" y="116" fill="#d9c591" text-anchor="middle">.NET 8 runtime</text>
+<text x="570" y="148" fill="#c8c8c8" text-anchor="middle">CC.Engine: Host entry points</text>
+<text x="570" y="172" fill="#c8c8c8" text-anchor="middle">Game.Scripts.dll, in a</text>
+<text x="570" y="196" fill="#c8c8c8" text-anchor="middle">collectible load context</text>
+<text x="570" y="220" fill="#c8c8c8" text-anchor="middle">script instances, timers</text>
+<line x1="256" y1="150" x2="464" y2="150" stroke="#d9c591" stroke-width="1.5"/>
+<polygon points="464,150 454,145 454,155" fill="#d9c591"/>
+<text x="360" y="136" fill="#c8c8c8" text-anchor="middle">calls into C#</text>
+<text x="360" y="172" fill="#8a8a84" text-anchor="middle">Dispatch, UpdateAll</text>
+<line x1="464" y1="235" x2="256" y2="235" stroke="#c8c8c8" stroke-width="1.5"/>
+<polygon points="256,235 266,230 266,240" fill="#c8c8c8"/>
+<text x="360" y="221" fill="#c8c8c8" text-anchor="middle">calls into C++</text>
+<text x="360" y="257" fill="#8a8a84" text-anchor="middle">findEntity, playSound</text>
+<text x="360" y="340" fill="#c8c8c8" text-anchor="middle">The two sides share only function pointers and plain values.</text>
+</svg>

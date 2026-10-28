@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" role="img" aria-label="Top view of an eye, a torch held below it, an object and a wall, showing that the torch's shadow falls beside the part of the wall the object hides from the eye">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <line x1="520" y1="40" x2="520" y2="300" stroke="#c8c8c8" stroke-width="2"/>
+  <line x1="90" y1="260" x2="520" y2="68.4" stroke="#d9c591" stroke-width="1" stroke-dasharray="6 5"/>
+  <line x1="90" y1="260" x2="520" y2="132.3" stroke="#d9c591" stroke-width="1" stroke-dasharray="6 5"/>
+  <line x1="90" y1="180" x2="520" y2="158.7" stroke="#8a8a84" stroke-width="1" stroke-dasharray="6 5"/>
+  <line x1="90" y1="180" x2="520" y2="222.6" stroke="#8a8a84" stroke-width="1" stroke-dasharray="6 5"/>
+  <rect x="288" y="170" width="8" height="30" fill="#1b1b19" stroke="#c8c8c8" stroke-width="1.5"/>
+  <circle cx="90" cy="180" r="5" fill="#c8c8c8"/>
+  <circle cx="90" cy="260" r="5" fill="#d9c591"/>
+  <line x1="540" y1="68.4" x2="540" y2="132.3" stroke="#d9c591" stroke-width="2"/>
+  <line x1="534" y1="68.4" x2="546" y2="68.4" stroke="#d9c591" stroke-width="2"/>
+  <line x1="534" y1="132.3" x2="546" y2="132.3" stroke="#d9c591" stroke-width="2"/>
+  <line x1="540" y1="158.7" x2="540" y2="222.6" stroke="#8a8a84" stroke-width="2"/>
+  <line x1="534" y1="158.7" x2="546" y2="158.7" stroke="#8a8a84" stroke-width="2"/>
+  <line x1="534" y1="222.6" x2="546" y2="222.6" stroke="#8a8a84" stroke-width="2"/>
+  <g font-family="Georgia, serif" font-size="14" fill="#c8c8c8">
+    <text x="90" y="166" text-anchor="middle">eye</text>
+    <text x="90" y="286" text-anchor="middle" fill="#d9c591">torch</text>
+    <text x="292" y="222" text-anchor="middle">object</text>
+    <text x="520" y="324" text-anchor="middle">wall</text>
+    <text x="556" y="105" fill="#d9c591">torch's shadow</text>
+    <text x="556" y="195" fill="#8a8a84">hidden by object</text>
+    <text x="360" y="350" text-anchor="middle" fill="#8a8a84">The eye cannot see behind the object, so the shadow beside it is fully visible.</text>
+  </g>
+</svg>

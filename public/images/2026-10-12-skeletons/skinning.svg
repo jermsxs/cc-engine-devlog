@@ -1,31 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="Inter, sans-serif" font-size="15">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="Georgia, serif" font-size="15">
   <rect width="720" height="360" fill="#0b0b0b"/>
-  <text x="190" y="36" text-anchor="middle" fill="#cfcfcb">Bind pose</text>
-  <text x="530" y="36" text-anchor="middle" fill="#cfcfcb">Posed: bone B bent 60 degrees</text>
+  <text x="190" y="36" text-anchor="middle" fill="#c8c8c8">Bind pose</text>
+  <text x="530" y="36" text-anchor="middle" fill="#c8c8c8">Posed: bone B bent 60 degrees</text>
 
-  <!-- bind pose -->
-  <line x1="190" y1="300" x2="190" y2="190" stroke="#cfcfcb" stroke-width="3"/>
-  <line x1="190" y1="190" x2="190" y2="80" stroke="#cfcfcb" stroke-width="3"/>
-  <circle cx="190" cy="300" r="5" fill="#0b0b0b" stroke="#cfcfcb" stroke-width="2"/>
-  <circle cx="190" cy="190" r="5" fill="#0b0b0b" stroke="#cfcfcb" stroke-width="2"/>
-  <circle cx="190" cy="80" r="5" fill="#0b0b0b" stroke="#cfcfcb" stroke-width="2"/>
-  <circle cx="225" cy="130" r="6" fill="#d8b67a"/>
-  <text x="170" y="250" text-anchor="end" fill="#8d8d89">bone A</text>
-  <text x="170" y="140" text-anchor="end" fill="#8d8d89">bone B</text>
-  <text x="240" y="126" fill="#d8b67a">vertex</text>
+  <line x1="190" y1="300" x2="190" y2="190" stroke="#c8c8c8" stroke-width="3"/>
+  <line x1="190" y1="190" x2="190" y2="80" stroke="#c8c8c8" stroke-width="3"/>
+  <circle cx="190" cy="300" r="5" fill="#0b0b0b" stroke="#c8c8c8" stroke-width="2"/>
+  <circle cx="190" cy="190" r="5" fill="#0b0b0b" stroke="#c8c8c8" stroke-width="2"/>
+  <circle cx="190" cy="80" r="5" fill="#0b0b0b" stroke="#c8c8c8" stroke-width="2"/>
+  <circle cx="225" cy="130" r="6" fill="#d9c591"/>
+  <text x="170" y="250" text-anchor="end" fill="#8a8a84">bone A</text>
+  <text x="170" y="140" text-anchor="end" fill="#8a8a84">bone B</text>
+  <text x="240" y="126" fill="#d9c591">vertex</text>
 
-  <!-- posed -->
-  <line x1="530" y1="300" x2="530" y2="190" stroke="#cfcfcb" stroke-width="3"/>
-  <line x1="530" y1="190" x2="625" y2="135" stroke="#cfcfcb" stroke-width="3"/>
-  <circle cx="530" cy="300" r="5" fill="#0b0b0b" stroke="#cfcfcb" stroke-width="2"/>
-  <circle cx="530" cy="190" r="5" fill="#0b0b0b" stroke="#cfcfcb" stroke-width="2"/>
-  <circle cx="625" cy="135" r="5" fill="#0b0b0b" stroke="#cfcfcb" stroke-width="2"/>
-  <circle cx="565" cy="130" r="6" fill="none" stroke="#8d8d89" stroke-width="2"/>
-  <circle cx="600" cy="190" r="6" fill="none" stroke="#8d8d89" stroke-width="2"/>
-  <circle cx="583" cy="160" r="6" fill="#d8b67a"/>
-  <text x="510" y="250" text-anchor="end" fill="#8d8d89">bone A</text>
-  <text x="640" y="130" fill="#8d8d89">bone B</text>
+  <line x1="530" y1="300" x2="530" y2="190" stroke="#c8c8c8" stroke-width="3"/>
+  <line x1="530" y1="190" x2="625" y2="135" stroke="#c8c8c8" stroke-width="3"/>
+  <circle cx="530" cy="300" r="5" fill="#0b0b0b" stroke="#c8c8c8" stroke-width="2"/>
+  <circle cx="530" cy="190" r="5" fill="#0b0b0b" stroke="#c8c8c8" stroke-width="2"/>
+  <circle cx="625" cy="135" r="5" fill="#0b0b0b" stroke="#c8c8c8" stroke-width="2"/>
+  <circle cx="565" cy="130" r="6" fill="none" stroke="#8a8a84" stroke-width="2"/>
+  <circle cx="600" cy="190" r="6" fill="none" stroke="#8a8a84" stroke-width="2"/>
+  <circle cx="583" cy="160" r="6" fill="#d9c591"/>
+  <text x="510" y="250" text-anchor="end" fill="#8a8a84">bone A</text>
+  <text x="640" y="130" fill="#8a8a84">bone B</text>
 
-  <text x="360" y="332" text-anchor="middle" fill="#8d8d89">Hollow: where the vertex lands if it follows only A, or only B.</text>
-  <text x="360" y="352" text-anchor="middle" fill="#8d8d89">Filled: with weights of 50% and 50%, it lands halfway between.</text>
+  <text x="360" y="332" text-anchor="middle" fill="#8a8a84">Hollow: where the vertex lands if it follows only A, or only B.</text>
+  <text x="360" y="352" text-anchor="middle" fill="#8a8a84">Filled: with weights of 50% and 50%, it lands halfway between.</text>
 </svg>

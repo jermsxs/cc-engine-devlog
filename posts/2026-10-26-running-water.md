@@ -1,69 +1,103 @@
 ---
-title: Water running down trunks, and a cheaper wet world
+title: Rivulets on vertical surfaces, and halving the wet pass cost
 date: 2026-10-26
 order: 2
-summary: Rivulets run down wet trunks and walls, then I measure what the wet world costs pass by pass and cut that cost roughly in half.
+summary: I add procedural water channels running down wet trunks and walls, then measure the wet world pass by pass and remove duplicated work from the depth prepass and the shelter lookups.
 tags: weather, performance, renderer
 cover: /images/2026-10-26-running-water/pier-torch.jpg
 ---
 
-By evening the woods were wet: darker mud, puddles in the ruts, soaked leaves. But a trunk looked the same as the ground. It had the same even film of water. Real vertical surfaces don't hold water like that. A wall or trunk sheds it. Water runs down in thin channels and leaves the surface between them only damp. Then, because I had added a lot of wet work in one day, I stopped to measure what it all cost.
+The wetness model from the previous post treated every surface alike. A trunk or a wall got the same even water film as the ground, and the film only changed the roughness. It did not look wet. Next I added water running down vertical surfaces, then measured what the whole wet system cost and brought that cost down.
 
-## Rivulets
+## Water running down trunks and walls
 
-> **Concept: Rivulets.** A *rivulet* is a thin stream of water running down a surface. Gravity pulls water down a steep face, and surface tension gathers it into narrow channels rather than a smooth sheet. The result is vertical streaks: a smooth, shiny core where water flows, with a darker wet trail either side, and drier surface between.
+### What happens on a real vertical surface
 
-I laid rivulets out in world space, as columns about 6 cm apart. A face looking down the z axis runs its columns along x, a face looking down x runs along z, and the two are blended by which way the surface faces. So a round trunk turns smoothly from one to the other without a seam.
+Water on a horizontal surface can lie as an even film or in puddles. On a vertical or steep surface it cannot. Gravity pulls the water down faster than surface tension can hold a film together, so the film breaks into narrow channels, rivulets, which run down at different speeds and meander around texture in the surface. The faces between the channels are left damp, but they carry no film of their own. A wet tree trunk or brick pier therefore looks like a darker surface crossed by vertical streaks. Each streak is smooth and shiny along its core, and has a darker wet trail on either side.
 
-- About half the columns carry water.
-- Each meanders a little, breaks into stretches along its length, and flows down at its own speed, from 0.5 to 1.2 m/s.
-- A rivulet has a smooth core, as smooth as my cap on gloss allows, and rounded, so a light draws a thin line down it. Either side of the core is a darker wet trail.
-- They only appear where the surface is steep, open to the rain and soaked through. Leaves, the ground and covered walls get none.
+### Ways to render this
 
-There was one surprise. While testing, I found that wet bark read almost entirely by the film's shine: the trunk looked the same whatever its colour, so no rivulet could show. The even film on steep faces now drops to a quarter, and the shine moves into the rivulets.
+An artist-driven method scrolls a flow texture down the UVs. It needs unwrapped geometry with consistent UV direction, and on a trunk where the UVs wrap around the cylinder the pattern would repeat or seam. A procedural method computes the rivulets from the world position in the pixel shader. It works on every mesh, at the cost of a few hashes per pixel. I used the procedural method because the woods have hundreds of trunks and I did not want to author flow maps for each.
 
-![A wet trunk by torchlight, before on the left and with running water on the right](/images/2026-10-26-running-water/trunk-torch.jpg "Left: before. Right: dark streaks run down the trunk, with sheen in their cores.")
+### How my rivulets work
 
-The effect shows on trunks a few metres away, as dark streaks with sheen in the cores, and clearly on the gate's brick piers:
+The code is `WetRivulets` in `Wet.hlsli`.
 
-![The gate's west pier by torchlight, before and with running water](/images/2026-10-26-running-water/pier-torch.jpg "The brick pier of the gate. On the right, vertical rivulets run down the corner.")
+- **Columns in world space.** The surface is divided into vertical columns about 6 cm wide. A face looking along z runs its columns along x, and a face looking along x runs them along z. The two sets are blended by which way the surface faces, so a round trunk turns smoothly from one to the other.
+- **Which columns run.** About half of the columns carry water. Each is displaced a little by two sine waves so that it meanders.
+- **Flow.** Along its length each column is broken into stretches by a hashed value that is interpolated and smoothed. The coordinate that is hashed advances with time at the column's own speed, from 0.5 to 1.2 m/s, so the stretches slide downward.
+- **Core and trail.** Inside a column, a parabolic profile gives a core (`1 - d²`, smooth water) and a much wider trail (`1 - 0.06·d²`, damp). The core uses the same roughness cap as the film, so it is as smooth as I allow water to be on a surface, and its cross-section is rounded: the normal is tilted by an amount that varies across the column, so a light draws a thin line down the middle. The trail only darkens the albedo (to 45%) and lowers the roughness a little.
+- **Where it applies.** Only where the surface is steep, open to the rain and soaked through, using the same wetness and shelter lookups as the film. Leaves, ground and covered walls get none.
+- **Less film on steep faces.** The even film on walls and trunks drops to a quarter. While testing, I found that wet bark was reading almost entirely through the film's shine. The trunk looked the same whatever its colour, so the rivulets could not show. With the film thinned, the shine moves into the rivulets.
 
-It is faint on the trunk right in front of the torch. That trunk is lit nearly to white, where the tone curve squeezes any change: a colour drop to a quarter only moves it from 215 to 180 out of 255. That is a limit of the torch, not of the water.
+### Result
 
-I checked the cost against a build without it: within run-to-run noise, at most about 0.1 ms. The day woods are pixel-identical, because the code runs only while the world is wet.
+The effect shows on trunks a few metres away, as dark streaks running down with sheen in their cores, and on the gate's brick piers.
 
-## What does the wet world cost?
+![A trunk in torchlight, before and after](/images/2026-10-26-running-water/trunk-torch.jpg "Left: an even wet film. Right: dark streaks with shiny cores run down the trunk.")
 
-This is what I mean by a measuring step. I added a report to my benchmark that shows the wet world's cost pass by pass, soaked against dry. And it showed where the time was really going.
+![The gate's pier in torchlight, before and after](/images/2026-10-26-running-water/pier-torch.jpg "Left: the pier with an even film. Right: water trails down the right-hand face.")
 
-> **Theory: Why one pass can cost twice.** A *depth prepass* draws the scene once, cheaply, to fill the depth buffer before the expensive lit pass. My prepass also hands normals and roughness to the screen-space passes, such as reflections and ambient occlusion. Because those need roughness, my prepass ran the whole wet shader too. So the wet work was done twice per pixel.
+The trunk directly in front of the torch is lit nearly white. The tone curve compresses bright values, so a colour change to a quarter moves a pixel only from 215 to 180 out of 255, and the effect is faint there. That is a property of the display transform and not a bug in the shader.
 
-Two problems, two fixes:
+A debug view of the core, the trail and the steepness showed streaks over every trunk in view and none on the ground or on leaves. The change costs between 0.1 ms faster and 0.16 ms slower in two rounds at 1440p, within run-to-run noise. The poses facing trunks and piers changed about 2.3% of their pixels, and the others less than 0.2%. The day woods are identical, because the code runs only while the world is wet.
 
-**The prepass did the wet work twice.** Shelter lookups, film, rivulets and puddles all ran in the prepass. That cost +0.15 to +0.31 ms by itself, more than the lit pass's share. But screen-space reflections only trace below roughness 0.2, and the film never gets that smooth. Only the puddles matter there. So the prepass now runs only the puddles, on level ground. It also had no relief, so its puddles sat where the noise alone put them, not where the lit pass draws water. It now takes the same height map tap, so reflections are traced where the water actually is. The puddle maths is shared between the two passes so they can't drift apart.
+## Measuring the cost
 
-**Five lookups for a covered pixel.** Only broad cover keeps the ground dry, so a point the shelter map called covered asked again at four points 0.6 m round it. Under the canopy that is most of the ground, and those four extra lookups cost about 0.15 ms. But the "erosion" is the same for every pixel over a map texel. So a small compute pass now bakes it: each texel takes the deepest of itself and the texels 0.6 m away, which is exactly "open if any of the five is open". It only runs when a shelter map is redrawn (the near one every 6.4 m walked, the level's every 64 m). A covered pixel now asks once.
+At this point the wet system cost about 0.33 ms per frame on average against a plan that allowed 0.1 ms. I had only measured the total, so I extended the benchmark to report the wet world's cost pass by pass, soaked against dry (`wetcost.py`), and to run a walk with a quick turn (`walkwet.py`). Per-pass GPU timings come from timestamp queries around each pass in the frame. Comparing the soaked and the dry runs of the same build, with TAA off and two rounds averaged, shows which pass moves.
+
+### The depth prepass did the wet work twice
+
+A depth prepass renders the scene's depth, and in my engine it also writes normals and roughness for the screen-space passes that need them: screen-space reflections (SSR) and ambient occlusion (GTAO). Because it shares the material code with the lit pass, it was running the whole wet function: shelter lookups, the film, the rivulets and the puddles. That cost +0.15 to +0.31 ms by itself, more than the lit pass's share of the wet cost.
+
+Most of that work was pointless. SSR traces rays only for surfaces smoother than roughness 0.2, and the water film never gets that smooth. Only the puddles do. GTAO barely notices the normal changes of a film. So the prepass now runs only the puddles, and only on level ground (`ApplyWetnessPrepass`).
+
+This also fixed a mismatch. The prepass had no relief height, so its puddles sat where the noise alone put them, not where the lit pass drew water. It now reads the height map's unshifted tap, so the reflections are traced where the water is. The puddle maths is shared between the two passes (`ApplyPuddle`, `WetPatches`) so they cannot drift apart.
+
+### Five lookups for each covered pixel
+
+The shelter test from the previous post is eroded: a point the map calls covered asks again at four points 0.6 m round it. Under the canopy most of the ground is covered, so most pixels there were doing five lookups. With the erosion left out, those four extra lookups cost about 0.15 ms.
+
+The erosion depends only on the map, not on the pixel, so it is the same for every pixel over a texel. A small compute pass now bakes it. Each texel stores the deepest of itself and the texels 0.6 m away, which is exactly "open if any of the five is open". It runs only when a shelter map is redrawn: the near map every 6.4 m walked and the level's map every 64 m. Both maps go into one 2048 × 1024 float texture, and the scene shader samples it once per map. A covered pixel now makes one lookup per map instead of five. The bake changes nothing in the image: mean difference 0.00 and no pixel off by more than 12 of 255.
+
+### Results
+
+Soaked against dry, at 1440p, TAA off, two rounds averaged:
 
 | | Before | After |
 |---|---|---|
-| Whole frame, soaked against dry | +0.20 to +0.58 ms (about +0.45 typical) | +0.08 to +0.46 ms (about +0.24 typical) |
-| Prepass | +0.15 to +0.31 ms | +0.03 to +0.12 ms |
+| Whole frame | +0.20 to +0.58 ms, about +0.45 typical | +0.08 to +0.46 ms, about +0.24 typical |
+| Depth prepass | +0.15 to +0.31 ms | +0.03 to +0.12 ms |
 | Lit pass | +0.07 to +0.32 ms | +0.03 to +0.30 ms |
+| SSR | +0.00 to +0.07 ms | unchanged |
 
-Walking the path with a quick turn, the wet world costs +0.14 to +0.18 ms in the mean (it was +0.28 ms before). Against the start of the day, with the scene's rain on, every bench pose is 0.2 to 0.45 ms faster, and the image hardly changed: at most 0.1% of pixels differ by more than 12/255. The bake alone, against the five lookups, changed no pixel by more than 12 levels and was 0.1 to 0.19 ms faster.
+Walking the path with a quick turn, soaked against dry in two rounds, the GPU mean is now +0.14 to +0.18 ms (it was +0.28 ms). The shadow pass, which now includes the bake, is unchanged at 0.23 ms. The worst frame is 13.0 ms soaked against 13.7 to 13.8 ms dry, apart from one first-round frame at 17.1 ms. Against the start of the day, with the scene's rain on, each benchmark pose is 0.2 to 0.45 ms faster (2.6% to 6.7%), and the image hardly changed (mean difference 0.06 or less, at most 0.1% of pixels off by more than 12 of 255).
 
-## What it looks like
+Mean frame brightness, dry against soaked, torch only:
 
-The soaked ground is darker in the torch, and in a flash the puddles mirror the lightning. The frame's mean brightness in torchlight goes from 25.2 dry to 19.0 soaked at the path's start.
+| Pose | Dry | Soaked |
+|---|---|---|
+| path start | 25.2 | 19.0 |
+| long stretch | 14.5 | 9.8 |
+| clearing | 16.6 | 13.1 |
+| gate close | 19.4 | 18.5 |
 
-![The path's start, dry and then soaked in rain](/images/2026-10-26-running-water/path-dry-wet.jpg "Left: dry. Right: soaked. The wet ground is darker and the rain streaks are fainter.")
+![The path start, dry and soaked](/images/2026-10-26-running-water/path-dry-wet.jpg "Left: dry. Right: soaked and raining. The ground is darker and there are rain streaks.")
 
-![The clearing in a flash, dry and soaked](/images/2026-10-26-running-water/clearing-flash-dry-wet.jpg "In a flash the soaked clearing (right) shows bright puddles and glistening patches that the dry one (left) doesn't.")
+In a flash at the clearing, the mean goes from 27.9 to 29.4 and the 99th percentile from 146 to 176, because the soaked ground is darker and the puddles mirror the flash.
 
-## What I still don't know
+![The clearing in a flash, dry and soaked](/images/2026-10-26-running-water/clearing-flash-dry-wet.jpg "Left: dry ground in a flash. Right: soaked ground with bright puddles mirroring the sky.")
 
-- The lit pass's wet share, +0.03 to +0.30 ms, is most of what is left. If I need more, the next things to measure are the ripples (two layers of hashed noise) and the rivulets.
-- I haven't checked in motion whether temporal anti-aliasing smears the flowing cores while the player walks. My motion check ended at a trunk the torch lights near white, so it was a limited test.
-- Roofs have no dripping edges yet. Drips from roof edges was an optional part of this step.
+### Checks
 
-I had also seen faint grey rectangles in a debug view of the puddles' reflections. I haven't proved they are real. Next came the leaves, which turned out to be the biggest part of the whole weather track.
+- The hallway, house and kitchen benchmarks, rendered with a clean build of an earlier commit and with this one, show no changed pixel in any pose, and timings within noise. The day woods are unchanged, because the bake and the wet code run only while the world is wet.
+- To check the rivulets in motion I walked towards a trunk and took screenshots with TAA on and off. There was no smearing, but the walk ends at a trunk the torch lights nearly white, so this check is limited.
+- `ctest` passes 116 of 116. The descriptor layout test now also checks the new slots and register t48.
+
+## Open issues
+
+- The lit pass's wet share (+0.03 to +0.30 ms) is now most of what remains. If I need more, I will measure the ripples (two hashed layers) and the rivulets next.
+- I have not checked whether TAA smears the flowing cores while walking.
+- Drips from roof edges, where the shelter map's height jumps, are not done.
+- The faint grey rectangles I once saw in a debug view of the puddles' reflections are still not verified.
+- Rain and thunder sound are the next step of the weather plan.

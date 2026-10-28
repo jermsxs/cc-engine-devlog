@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="Georgia, serif" font-size="14">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <text x="170" y="76" text-anchor="middle" fill="#c8c8c8">Mode 6</text>
+  <text x="490" y="76" text-anchor="middle" fill="#c8c8c8">Mode 1 or mode 3</text>
+  <rect x="90" y="100" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="410" y="100" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="130" y="100" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="450" y="100" width="40" height="40" fill="#d9c591" fill-opacity="0.6" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="170" y="100" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="490" y="100" width="40" height="40" fill="#d9c591" fill-opacity="0.6" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="210" y="100" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="530" y="100" width="40" height="40" fill="#d9c591" fill-opacity="0.6" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="90" y="140" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="410" y="140" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="130" y="140" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="450" y="140" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="170" y="140" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="490" y="140" width="40" height="40" fill="#d9c591" fill-opacity="0.6" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="210" y="140" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="530" y="140" width="40" height="40" fill="#d9c591" fill-opacity="0.6" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="90" y="180" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="410" y="180" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="130" y="180" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="450" y="180" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="170" y="180" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="490" y="180" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="210" y="180" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="530" y="180" width="40" height="40" fill="#d9c591" fill-opacity="0.6" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="90" y="220" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="410" y="220" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="130" y="220" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="450" y="220" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="170" y="220" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="490" y="220" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="210" y="220" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <rect x="530" y="220" width="40" height="40" fill="#2a2a26" stroke="#8a8a84" stroke-width="1"/>
+  <text x="170" y="290" text-anchor="middle" fill="#8a8a84">One subset, one pair of endpoints</text>
+  <text x="490" y="290" text-anchor="middle" fill="#8a8a84">Two subsets, two pairs of endpoints</text>
+  <text x="360" y="332" text-anchor="middle" fill="#8a8a84">A 4 by 4 block. The split shown is one example of the 64 partitions.</text>
+</svg>

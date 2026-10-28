@@ -1,22 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Inter, sans-serif" font-size="15" role="img">
-<title>An AI agent talks to the MCP server, which edits either a running editor over a named pipe or a headless copy of the scene</title>
-<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8d8d89"/></marker></defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15" role="img">
+<title>An agent calls the MCP server, which edits either a running editor over a named pipe or a headless scene</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a8a84"/></marker></defs>
 <rect width="720" height="360" fill="#0b0b0b"/>
-<g fill="none" stroke="#cfcfcb" stroke-width="1.5">
-<rect x="30" y="130" width="140" height="64" rx="6"/><rect x="235" y="130" width="150" height="64" rx="6" stroke="#d8b67a"/>
-<rect x="450" y="50" width="240" height="64" rx="6"/><rect x="450" y="210" width="240" height="64" rx="6"/>
+<g fill="none" stroke="#c8c8c8" stroke-width="1.5">
+<rect x="20" y="145" width="120" height="70" rx="6"/>
+<rect x="190" y="145" width="140" height="70" rx="6" stroke="#d9c591"/>
+<rect x="490" y="50" width="210" height="90" rx="6"/>
+<rect x="490" y="220" width="210" height="90" rx="6"/>
 </g>
-<g fill="#cfcfcb" text-anchor="middle">
-<text x="100" y="157">AI agent</text><text x="310" y="157" fill="#d8b67a">CCMcp.exe</text>
-<text x="570" y="77">Running editor</text><text x="570" y="237">No editor open</text>
+<g fill="#c8c8c8" text-anchor="middle">
+<text x="80" y="176">Agent</text><text x="260" y="176" fill="#d9c591">CCMcp.exe</text>
+<text x="595" y="78">Running editor</text><text x="595" y="248">Headless session</text>
 </g>
-<g fill="#8d8d89" text-anchor="middle" font-size="14">
-<text x="100" y="178">(Claude Code)</text><text x="310" y="178">the MCP server</text>
-<text x="570" y="99">named pipe, Ctrl+Z works</text><text x="570" y="259">loads scene, renders offscreen</text>
-<text x="202" y="150">stdio</text>
+<g fill="#8a8a84" text-anchor="middle" font-size="13">
+<text x="80" y="198">MCP client</text><text x="260" y="198">26 tools</text>
+<text x="595" y="100">runs the call between frames</text><text x="595" y="120">edit shows live, Ctrl+Z works</text>
+<text x="595" y="270">loads the scene itself</text><text x="595" y="290">offscreen render, no window</text>
+<text x="165" y="136">stdio</text>
 </g>
-<g stroke="#8d8d89" stroke-width="1.5" fill="none" marker-end="url(#a)">
-<line x1="170" y1="162" x2="233" y2="162"/><line x1="385" y1="150" x2="448" y2="94"/><line x1="385" y1="174" x2="448" y2="232"/>
+<g stroke="#8a8a84" stroke-width="1.5" fill="none" marker-end="url(#a)">
+<line x1="140" y1="180" x2="188" y2="180"/>
+<path d="M330 165 L400 165 L400 95 L488 95"/>
+<path d="M330 195 L400 195 L400 265 L488 265"/>
 </g>
-<text x="360" y="325" text-anchor="middle" fill="#8d8d89" font-size="14">both paths edit through the same EditorSession</text>
+<g fill="#8a8a84" font-size="13">
+<text x="408" y="150">named pipe</text>
+<text x="408" y="190">no editor running</text>
+</g>
+<text x="360" y="345" text-anchor="middle" fill="#8a8a84" font-size="14">both paths call the same EditorSession</text>
 </svg>

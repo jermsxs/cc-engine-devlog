@@ -1,19 +1,31 @@
-The **CC Horror Engine** is a survival-horror engine and editor I'm building from scratch in C++20 and DirectX 12, for Windows. The visual target is the look of Resident Evil 7 and Village: dim, grimy, realistic interiors, lit like a film rather than a game.
+The **CC Horror Engine** is a survival-horror engine and editor that I am writing from scratch in C++20 and DirectX 12, for Windows. The visual target is the look of Resident Evil 7 and Village: dim, worn, realistic interiors lit the way a film would light them.
 
-![A dim hallway with a wall lamp, framed paintings and a window at the far end](/images/2026-10-28-five-months-in/game-start.jpg "The hallway that started it all.")
+![A dim hallway with a wall lamp, framed paintings and a window at the far end](/images/2026-10-28-five-months-in/game-start.jpg "The hallway scene that the project started from.")
 
-## What's in it
+## Main systems
 
-- **Renderer.** DirectX 12, physically based lighting, shadows for the lights that matter, clustered lighting, lightmaps and probes, ambient occlusion, screen-space reflections and indirect light, volumetric fog and clouds, temporal anti-aliasing, and a camera pipeline with bloom, auto-exposure, colour grading and film grain.
-- **Materials.** Scanned PBR materials, wear and grime layers, decals, parallax relief, texture compression and streaming.
-- **World.** Physics, a first-person player who can crouch, lean, carry and throw, doors, triggers, light switches, skeletal animation, an enemy, and weather: rain, wet surfaces, lightning.
-- **Editor.** A custom immediate-mode UI with docks, a model viewer, a material library and live asset reload. AI agents can drive the editor through an MCP server, with every edit undoable.
-- **Scripting.** Gameplay in C#, hosted by the engine through .NET.
+- **Renderer:** DirectX 12 with physically based shading, plus:
+  - shadow maps for the lights that affect the view, and clustered lighting;
+  - lightmaps and probes;
+  - ground-truth ambient occlusion, screen-space reflections and screen-space indirect light;
+  - volumetric fog and clouds, and temporal anti-aliasing;
+  - a camera pipeline with auto-exposure, bloom, colour grading and film grain.
+- **Materials:** scanned PBR materials, layered wear and grime, projected decals, parallax relief, block compression and texture streaming.
+- **Simulation and gameplay:**
+  - rigid-body physics;
+  - a first-person player who can crouch, lean, carry and throw;
+  - doors, triggers and light circuits;
+  - skeletal animation and an enemy;
+  - weather with rain, wet surfaces and lightning.
+- **Editor:**
+  - a custom immediate-mode UI with docking panels, a model viewer, a material library and live asset reload;
+  - an MCP server, so external tools and AI agents can drive the editor with undoable edits.
+- **Scripting:** gameplay logic in C#, with the .NET runtime hosted by the engine.
 
-There are no third-party libraries: everything above is written on top of the Windows SDK.
+The engine uses no third-party libraries. Everything above is written against the Windows SDK.
 
 ## About this diary
 
-Every work session ends with an entry in the engine's own dev diary, with screenshots and benchmark numbers. This site turns those entries into readable posts: what I added, why, the theory behind it, and how it works in practice.
+I end every work session with an entry in the engine's internal diary, including screenshots and benchmark numbers. This site turns those entries into readable posts. Each one explains what I built, the theory behind it, and how my implementation works.
 
-The first goal is a 3 to 5 minute playable demo: a haunted hallway, a few interactions, and one quiet scare.
+The first milestone is a 3–5 minute playable demo: a haunted hallway, a few interactions, and one scripted scare.

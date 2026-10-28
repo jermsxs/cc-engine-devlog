@@ -1,14 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Inter, sans-serif" font-size="15" role="img">
-<title>GPU timestamps written between passes; each pass time is the difference of two timestamps</title>
-<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8d8d89"/></marker></defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15" role="img">
+<title>GPU timestamps written between passes; the time of a pass is the difference of two timestamps</title>
 <rect width="720" height="360" fill="#0b0b0b"/>
-<text x="360" y="50" text-anchor="middle" fill="#cfcfcb" font-size="16">The GPU stamps the time between its passes</text>
-<g fill="none" stroke="#cfcfcb" stroke-width="1.5">
-<rect x="80" y="110" width="100" height="60" rx="4"/><rect x="180" y="110" width="240" height="60" rx="4" stroke="#d8b67a"/><rect x="420" y="110" width="120" height="60" rx="4"/><rect x="540" y="110" width="100" height="60" rx="4"/>
+<text x="360" y="44" text-anchor="middle" fill="#c8c8c8">Timestamps written into the command list</text>
+<g fill="none" stroke="#c8c8c8" stroke-width="1.5">
+<rect x="30" y="130" width="165" height="70"/>
+<rect x="195" y="130" width="165" height="70" stroke="#d9c591"/>
+<rect x="360" y="130" width="165" height="70"/>
+<rect x="525" y="130" width="165" height="70"/>
 </g>
-<g fill="#cfcfcb" text-anchor="middle"><text x="130" y="146">Shadow</text><text x="300" y="146" fill="#d8b67a">Scene</text><text x="480" y="146">Post</text><text x="590" y="146">UI</text></g>
-<g stroke="#8d8d89" stroke-width="1.5"><line x1="80" y1="95" x2="80" y2="185"/><line x1="180" y1="95" x2="180" y2="185"/><line x1="420" y1="95" x2="420" y2="185"/><line x1="540" y1="95" x2="540" y2="185"/><line x1="640" y1="95" x2="640" y2="185"/></g>
-<g fill="#8d8d89" text-anchor="middle" font-size="14"><text x="80" y="208">T0</text><text x="180" y="208">T1</text><text x="420" y="208">T2</text><text x="540" y="208">T3</text><text x="640" y="208">T4</text></g>
-<text x="360" y="262" text-anchor="middle" fill="#cfcfcb">scene pass = (T2 &#8722; T1) &#247; clock rate</text>
-<text x="360" y="292" text-anchor="middle" fill="#8d8d89" font-size="14">read back once the GPU has finished, so the CPU never waits</text>
+<g fill="#c8c8c8" text-anchor="middle">
+<text x="112" y="172">Shadow</text><text x="277" y="172" fill="#d9c591">Scene</text><text x="442" y="172">Post</text><text x="607" y="172">UI</text>
+</g>
+<g stroke="#8a8a84" stroke-width="1.5">
+<line x1="30" y1="100" x2="30" y2="215"/><line x1="195" y1="100" x2="195" y2="215"/><line x1="360" y1="100" x2="360" y2="215"/><line x1="525" y1="100" x2="525" y2="215"/><line x1="690" y1="100" x2="690" y2="215"/>
+</g>
+<g fill="#8a8a84" text-anchor="middle" font-size="14">
+<text x="30" y="92">T0</text><text x="195" y="92">T1</text><text x="360" y="92">T2</text><text x="525" y="92">T3</text><text x="690" y="92">T4</text>
+</g>
+<text x="360" y="268" text-anchor="middle" fill="#c8c8c8" font-size="14">pass time in ms = (T(n+1) - T(n)) / timestamp frequency x 1000</text>
+<text x="360" y="296" text-anchor="middle" fill="#8a8a84" font-size="14">the values are resolved into a buffer and read on the CPU a few frames later</text>
 </svg>
