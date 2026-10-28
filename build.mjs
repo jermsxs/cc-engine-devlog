@@ -199,11 +199,11 @@ ${html}
   </div>
   ${postFooter(post)}
 </article>
-<nav class="blog-pager">
-  ${next ? `<a class="newer" href="/posts/${next.slug}/" title="${escapeHtml(next.title)}">&laquo; Newer post</a>` : '<span class="newer"></span>'}
-  <a class="home" href="/">Home</a>
-  ${prev ? `<a class="older" href="/posts/${prev.slug}/" title="${escapeHtml(prev.title)}">Older post &raquo;</a>` : '<span class="older"></span>'}
-</nav>`;
+<nav class="entry-nav">
+  ${prev ? `<a class="prev" href="/posts/${prev.slug}/"><span class="label">&laquo; Previous entry</span><span class="date">${formatDate(prev.date)}</span>${escapeHtml(prev.title)}</a>` : '<span class="prev none"><span class="label">&laquo; Previous entry</span>This is the first entry.</span>'}
+  ${next ? `<a class="next" href="/posts/${next.slug}/"><span class="label">Next entry &raquo;</span><span class="date">${formatDate(next.date)}</span>${escapeHtml(next.title)}</a>` : '<span class="next none"><span class="label">Next entry &raquo;</span>This is the latest entry.</span>'}
+</nav>
+<p class="back-home"><a href="/">Back to all entries</a></p>`;
   return layout({ title: post.title, description: post.summary, body, path: `/posts/${post.slug}/`, image: post.cover, posts, current: post });
 }
 
