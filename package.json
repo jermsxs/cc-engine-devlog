@@ -1,0 +1,14 @@
+{
+  "name": "cc-engine-devlog",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dev diary blog for the CC Horror Engine",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "preview": "node build.mjs && npx --yes serve dist"
+  },
+  "dependencies": {
+    "marked": "15.0.12"
+  }
+}
