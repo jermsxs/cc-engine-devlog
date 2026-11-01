@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15" role="img">
+<title>A live shader reload: a worker thread finds, recompiles and builds pipelines, then the frame thread waits for the GPU once and swaps them in</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a8a84"/></marker></defs>
+<rect width="720" height="360" fill="#0b0b0b"/>
+<g fill="#8a8a84" text-anchor="middle" font-size="13">
+<text x="170" y="26">background worker thread</text>
+<text x="550" y="112">frame thread</text>
+</g>
+<g fill="none" stroke="#c8c8c8" stroke-width="1.5">
+<rect x="30" y="40" width="280" height="60" rx="6"/>
+<rect x="30" y="130" width="280" height="60" rx="6"/>
+<rect x="30" y="220" width="280" height="60" rx="6"/>
+<rect x="410" y="130" width="280" height="60" rx="6" stroke="#d9c591"/>
+<rect x="410" y="220" width="280" height="60" rx="6" stroke="#d9c591"/>
+</g>
+<g fill="#c8c8c8" text-anchor="middle" font-size="14">
+<text x="170" y="66">Find the programs that read the file</text>
+<text x="170" y="156">Recompile them in parallel</text>
+<text x="170" y="246">Create the new pipelines</text>
+<text x="550" y="156" fill="#d9c591">Wait for the GPU once</text>
+<text x="550" y="246" fill="#d9c591">Swap the pipelines in</text>
+</g>
+<g fill="#8a8a84" text-anchor="middle" font-size="13">
+<text x="170" y="86">from each program's include list</text>
+<text x="170" y="176">through the shader cache</text>
+<text x="170" y="266">any failure: stop, change nothing</text>
+<text x="550" y="176">before the frame's commands open</text>
+<text x="550" y="266">redraw the cached shadow tiles</text>
+</g>
+<g stroke="#8a8a84" stroke-width="1.5" fill="none" marker-end="url(#a)">
+<line x1="170" y1="100" x2="170" y2="128"/>
+<line x1="170" y1="190" x2="170" y2="218"/>
+<path d="M310 250 L360 250 L360 160 L408 160"/>
+<line x1="550" y1="190" x2="550" y2="218"/>
+</g>
+<text x="360" y="328" text-anchor="middle" fill="#8a8a84" font-size="14">a failed compile or pipeline leaves the old shaders running</text>
+</svg>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <text x="360" y="36" font-size="16" fill="#d9c591" text-anchor="middle">A float3 followed by a float2 in a constant buffer</text>
+  <g font-size="14" fill="#8a8a84" text-anchor="middle">
+    <text x="100" y="78">byte 0</text>
+    <text x="356" y="78">byte 16</text>
+    <text x="612" y="78">byte 32</text>
+  </g>
+  <line x1="356" y1="88" x2="356" y2="250" stroke="#d9c591" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <g font-size="15" fill="#c8c8c8">
+    <text x="20" y="125">HLSL</text>
+    <text x="20" y="225">C++</text>
+  </g>
+  <g stroke="#c8c8c8" stroke-width="1.5" fill="none">
+    <rect x="100" y="100" width="192" height="40"/>
+    <rect x="356" y="100" width="128" height="40"/>
+    <rect x="100" y="200" width="192" height="40"/>
+    <rect x="292" y="200" width="128" height="40"/>
+  </g>
+  <rect x="292" y="100" width="64" height="40" fill="none" stroke="#8a8a84" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <g font-size="14" text-anchor="middle" fill="#c8c8c8">
+    <text x="196" y="125">float3 a</text>
+    <text x="324" y="125" fill="#8a8a84">padding</text>
+    <text x="420" y="125">float2 b</text>
+    <text x="196" y="225">float3 a</text>
+    <text x="356" y="268" fill="#d9c591">float2 b, bytes 12 to 19</text>
+  </g>
+  <text x="360" y="320" font-size="15" fill="#d9c591" text-anchor="middle">The shader reads b at byte 16, but C++ wrote it at byte 12.</text>
+</svg>

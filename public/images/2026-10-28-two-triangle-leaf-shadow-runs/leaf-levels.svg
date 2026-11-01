@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <text x="360" y="50" font-size="16" fill="#d9c591" text-anchor="middle">Which version of a leaf is drawn, by distance (1440p)</text>
+  <g stroke="#c8c8c8" stroke-width="1.5" fill="none">
+    <rect x="60" y="100" width="190" height="90"/>
+    <rect x="265" y="100" width="190" height="90"/>
+    <rect x="470" y="100" width="190" height="90"/>
+  </g>
+  <g font-size="15" text-anchor="middle">
+    <g fill="#d9c591">
+      <text x="155" y="132">Full leaf</text>
+      <text x="360" y="132">Far twin</text>
+      <text x="565" y="132">Tiny twin</text>
+    </g>
+    <g fill="#c8c8c8">
+      <text x="155" y="158">8 triangles</text>
+      <text x="360" y="158">4 triangles</text>
+      <text x="565" y="158">2 triangles</text>
+    </g>
+    <g fill="#8a8a84" font-size="14">
+      <text x="155" y="179">fold along the midrib</text>
+      <text x="360" y="179">flat, same outline</text>
+      <text x="565" y="179">flat quad, same area</text>
+    </g>
+  </g>
+  <line x1="60" y1="235" x2="660" y2="235" stroke="#8a8a84" stroke-width="1.5"/>
+  <g stroke="#8a8a84" stroke-width="1.5">
+    <line x1="60" y1="229" x2="60" y2="241"/>
+    <line x1="260" y1="229" x2="260" y2="241"/>
+    <line x1="460" y1="229" x2="460" y2="241"/>
+  </g>
+  <g font-size="14" fill="#c8c8c8" text-anchor="middle">
+    <text x="60" y="262">near</text>
+    <text x="260" y="262">about 12.5 m</text>
+    <text x="460" y="262">about 25 m</text>
+  </g>
+  <g font-size="14" fill="#8a8a84" text-anchor="middle">
+    <text x="260" y="284">leaf 12 px long</text>
+    <text x="460" y="284">leaf 6 px long</text>
+  </g>
+  <text x="360" y="328" font-size="14" fill="#8a8a84" text-anchor="middle">Shadow passes draw the far twin at every distance.</text>
+</svg>

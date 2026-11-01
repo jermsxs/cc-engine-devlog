@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <text x="360" y="36" font-size="16" fill="#d9c591" text-anchor="middle">Compaction in a wave of eight lanes</text>
+  <g font-size="14" fill="#8a8a84">
+    <text x="20" y="78">lane</text>
+    <text x="20" y="121">visible</text>
+    <text x="20" y="176">slot</text>
+  </g>
+  <text x="178" y="78" font-size="14" fill="#8a8a84" text-anchor="middle">0</text>
+  <rect x="150" y="95" width="56" height="40" fill="none" stroke="#d9c591" stroke-width="1.5"/>
+  <text x="178" y="121" font-size="15" fill="#d9c591" text-anchor="middle">1</text>
+  <rect x="150" y="150" width="56" height="40" fill="none" stroke="#d9c591" stroke-width="1.5"/>
+  <text x="178" y="176" font-size="15" fill="#d9c591" text-anchor="middle">B+0</text>
+  <text x="238" y="78" font-size="14" fill="#8a8a84" text-anchor="middle">1</text>
+  <rect x="210" y="95" width="56" height="40" fill="none" stroke="#8a8a84" stroke-width="1.5"/>
+  <text x="238" y="121" font-size="15" fill="#8a8a84" text-anchor="middle">0</text>
+  <rect x="210" y="150" width="56" height="40" fill="none" stroke="#8a8a84" stroke-width="1.5"/>
+  <text x="238" y="176" font-size="15" fill="#8a8a84" text-anchor="middle">-</text>
+  <text x="298" y="78" font-size="14" fill="#8a8a84" text-anchor="middle">2</text>
+  <rect x="270" y="95" width="56" height="40" fill="none" stroke="#d9c591" stroke-width="1.5"/>
+  <text x="298" y="121" font-size="15" fill="#d9c591" text-anchor="middle">1</text>
+  <rect x="270" y="150" width="56" height="40" fill="none" stroke="#d9c591" stroke-width="1.5"/>
+  <text x="298" y="176" font-size="15" fill="#d9c591" text-anchor="middle">B+1</text>
+  <text x="358" y="78" font-size="14" fill="#8a8a84" text-anchor="middle">3</text>
+  <rect x="330" y="95" width="56" height="40" fill="none" stroke="#d9c591" stroke-width="1.5"/>
+  <text x="358" y="121" font-size="15" fill="#d9c591" text-anchor="middle">1</text>
+  <rect x="330" y="150" width="56" height="40" fill="none" stroke="#d9c591" stroke-width="1.5"/>
+  <text x="358" y="176" font-size="15" fill="#d9c591" text-anchor="middle">B+2</text>
+  <text x="418" y="78" font-size="14" fill="#8a8a84" text-anchor="middle">4</text>
+  <rect x="390" y="95" width="56" height="40" fill="none" stroke="#8a8a84" stroke-width="1.5"/>
+  <text x="418" y="121" font-size="15" fill="#8a8a84" text-anchor="middle">0</text>
+  <rect x="390" y="150" width="56" height="40" fill="none" stroke="#8a8a84" stroke-width="1.5"/>
+  <text x="418" y="176" font-size="15" fill="#8a8a84" text-anchor="middle">-</text>
+  <text x="478" y="78" font-size="14" fill="#8a8a84" text-anchor="middle">5</text>
+  <rect x="450" y="95" width="56" height="40" fill="none" stroke="#8a8a84" stroke-width="1.5"/>
+  <text x="478" y="121" font-size="15" fill="#8a8a84" text-anchor="middle">0</text>
+  <rect x="450" y="150" width="56" height="40" fill="none" stroke="#8a8a84" stroke-width="1.5"/>
+  <text x="478" y="176" font-size="15" fill="#8a8a84" text-anchor="middle">-</text>
+  <text x="538" y="78" font-size="14" fill="#8a8a84" text-anchor="middle">6</text>
+  <rect x="510" y="95" width="56" height="40" fill="none" stroke="#d9c591" stroke-width="1.5"/>
+  <text x="538" y="121" font-size="15" fill="#d9c591" text-anchor="middle">1</text>
+  <rect x="510" y="150" width="56" height="40" fill="none" stroke="#d9c591" stroke-width="1.5"/>
+  <text x="538" y="176" font-size="15" fill="#d9c591" text-anchor="middle">B+3</text>
+  <text x="598" y="78" font-size="14" fill="#8a8a84" text-anchor="middle">7</text>
+  <rect x="570" y="95" width="56" height="40" fill="none" stroke="#8a8a84" stroke-width="1.5"/>
+  <text x="598" y="121" font-size="15" fill="#8a8a84" text-anchor="middle">0</text>
+  <rect x="570" y="150" width="56" height="40" fill="none" stroke="#8a8a84" stroke-width="1.5"/>
+  <text x="598" y="176" font-size="15" fill="#8a8a84" text-anchor="middle">-</text>
+  <g font-size="15" fill="#c8c8c8">
+    <text x="150" y="235">WaveActiveCountBits(visible) = 4</text>
+    <text x="150" y="262">One lane adds 4 to the shared counter once and gets the base slot B back.</text>
+    <text x="150" y="289">Each visible lane writes at B plus the number of visible lanes before it.</text>
+  </g>
+</svg>

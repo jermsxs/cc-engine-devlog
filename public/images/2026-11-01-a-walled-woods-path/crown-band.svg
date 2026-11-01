@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <text x="360" y="30" text-anchor="middle" fill="#c8c8c8">Placing a plant beside the path, seen from above</text>
+  <text x="360" y="50" text-anchor="middle" fill="#8a8a84">not to scale</text>
+  <line x1="40" y1="190" x2="690" y2="190" stroke="#8a8a84" stroke-width="2"/>
+  <line x1="40" y1="250" x2="690" y2="250" stroke="#8a8a84" stroke-width="2"/>
+  <text x="360" y="225" text-anchor="middle" fill="#8a8a84">path, 2.5 m wide</text>
+  <line x1="40" y1="178" x2="610" y2="178" stroke="#d9c591" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="690" y="170" text-anchor="end" fill="#d9c591">nearOffset</text>
+  <circle cx="190" cy="180" r="54" fill="none" stroke="#c8c8c8" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <circle cx="190" cy="180" r="4" fill="#c8c8c8"/>
+  <circle cx="500" cy="124" r="54" fill="none" stroke="#c8c8c8" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <circle cx="500" cy="124" r="4" fill="#c8c8c8"/>
+  <text x="190" y="290" text-anchor="middle" fill="#c8c8c8">placed by trunk</text>
+  <text x="190" y="312" text-anchor="middle" fill="#8a8a84">the crown overhangs the path</text>
+  <text x="500" y="290" text-anchor="middle" fill="#c8c8c8">placed by crown edge</text>
+  <text x="500" y="312" text-anchor="middle" fill="#8a8a84">the crown stops at the line</text>
+</svg>

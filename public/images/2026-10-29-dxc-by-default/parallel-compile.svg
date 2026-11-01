@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15" role="img">
+<title>Programs not in the cache are queued, worker threads compile them, and the renderer takes each finished job by its key</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a8a84"/></marker></defs>
+<rect width="720" height="360" fill="#0b0b0b"/>
+<g fill="none" stroke="#c8c8c8" stroke-width="1.5">
+<rect x="30" y="70" width="140" height="150" rx="6"/>
+<rect x="230" y="60" width="150" height="44" rx="6"/>
+<rect x="230" y="123" width="150" height="44" rx="6"/>
+<rect x="230" y="186" width="150" height="44" rx="6"/>
+<rect x="450" y="70" width="240" height="150" rx="6"/>
+<rect x="450" y="264" width="240" height="60" rx="6" stroke="#d9c591"/>
+</g>
+<g fill="#c8c8c8" text-anchor="middle" font-size="15">
+<text x="100" y="140">Queue</text>
+<text x="305" y="88">Worker 1</text>
+<text x="305" y="151">Worker 2</text>
+<text x="305" y="214">Worker N</text>
+<text x="570" y="140">Finished jobs</text>
+<text x="570" y="290" fill="#d9c591">Renderer thread</text>
+</g>
+<g fill="#8a8a84" text-anchor="middle" font-size="13">
+<text x="100" y="160">uncached programs</text>
+<text x="570" y="160">bytecode, cache file written</text>
+<text x="570" y="310">takes a job by its key, or waits</text>
+</g>
+<g stroke="#8a8a84" stroke-width="1.5" fill="none" marker-end="url(#a)">
+<line x1="170" y1="130" x2="228" y2="82"/>
+<line x1="170" y1="145" x2="228" y2="145"/>
+<line x1="170" y1="160" x2="228" y2="208"/>
+<line x1="380" y1="82" x2="448" y2="110"/>
+<line x1="380" y1="145" x2="448" y2="145"/>
+<line x1="380" y1="208" x2="448" y2="180"/>
+<line x1="570" y1="220" x2="570" y2="262"/>
+</g>
+<g fill="#8a8a84" font-size="13">
+<text x="30" y="290">workers: cores minus one, up to 16</text>
+<text x="30" y="310">a job not started yet is compiled</text>
+<text x="30" y="328">by the renderer thread itself</text>
+</g>
+</svg>

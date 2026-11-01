@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a8a84"/>
+    </marker>
+  </defs>
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <text x="360" y="60" font-size="16" fill="#d9c591" text-anchor="middle">From a whole-number key to a random float</text>
+  <rect x="12" y="130" width="120" height="80" fill="none" stroke="#c8c8c8" stroke-width="1.5"/>
+  <text x="72" y="162" font-size="15" fill="#c8c8c8" text-anchor="middle">key</text>
+  <text x="72" y="184" font-size="14" fill="#8a8a84" text-anchor="middle">cell or pixel</text>
+  <text x="72" y="204" font-size="14" fill="#8a8a84" text-anchor="middle">and frame</text>
+  <line x1="136" y1="170" x2="152" y2="170" stroke="#8a8a84" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="156" y="130" width="120" height="80" fill="none" stroke="#d9c591" stroke-width="1.5"/>
+  <text x="216" y="162" font-size="15" fill="#d9c591" text-anchor="middle">HashWord</text>
+  <text x="216" y="184" font-size="14" fill="#8a8a84" text-anchor="middle">PCG3D</text>
+  <line x1="280" y1="170" x2="296" y2="170" stroke="#8a8a84" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="300" y="130" width="120" height="80" fill="none" stroke="#c8c8c8" stroke-width="1.5"/>
+  <text x="360" y="162" font-size="15" fill="#c8c8c8" text-anchor="middle">32-bit word</text>
+  <text x="360" y="184" font-size="14" fill="#8a8a84" text-anchor="middle">three per key</text>
+  <line x1="424" y1="170" x2="440" y2="170" stroke="#8a8a84" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="444" y="130" width="120" height="80" fill="none" stroke="#c8c8c8" stroke-width="1.5"/>
+  <text x="504" y="162" font-size="15" fill="#c8c8c8" text-anchor="middle">top 24 bits</text>
+  <text x="504" y="184" font-size="14" fill="#8a8a84" text-anchor="middle">word >> 8</text>
+  <line x1="568" y1="170" x2="584" y2="170" stroke="#8a8a84" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="588" y="130" width="120" height="80" fill="none" stroke="#c8c8c8" stroke-width="1.5"/>
+  <text x="648" y="162" font-size="15" fill="#c8c8c8" text-anchor="middle">float</text>
+  <text x="648" y="184" font-size="14" fill="#8a8a84" text-anchor="middle">divide by 2^24</text>
+  <text x="648" y="204" font-size="14" fill="#8a8a84" text-anchor="middle">in [0, 1)</text>
+  <text x="360" y="280" font-size="15" fill="#c8c8c8" text-anchor="middle">Unsigned integer arithmetic wraps the same way on every compiler and GPU.</text>
+</svg>

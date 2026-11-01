@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif" font-size="15" role="img">
+<title>HLSL source compiled by FXC to DXBC or by DXC to signed DXIL, then translated by the driver into GPU machine code</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a8a84"/></marker></defs>
+<rect width="720" height="360" fill="#0b0b0b"/>
+<g fill="none" stroke="#c8c8c8" stroke-width="1.5">
+<rect x="30" y="150" width="120" height="60" rx="6"/>
+<rect x="200" y="60" width="140" height="64" rx="6"/>
+<rect x="200" y="236" width="140" height="64" rx="6" stroke="#d9c591"/>
+<rect x="390" y="60" width="130" height="64" rx="6"/>
+<rect x="390" y="236" width="130" height="64" rx="6" stroke="#d9c591"/>
+<rect x="570" y="150" width="120" height="60" rx="6"/>
+</g>
+<g fill="#c8c8c8" text-anchor="middle" font-size="15">
+<text x="90" y="176">HLSL source</text>
+<text x="270" y="88">FXC</text>
+<text x="270" y="264" fill="#d9c591">DXC</text>
+<text x="455" y="88">DXBC</text>
+<text x="455" y="264" fill="#d9c591">DXIL</text>
+<text x="630" y="176">Driver</text>
+</g>
+<g fill="#8a8a84" text-anchor="middle" font-size="13">
+<text x="90" y="196">text and defines</text>
+<text x="270" y="108">Shader Model 5</text>
+<text x="270" y="284">Shader Model 6</text>
+<text x="455" y="108">older bytecode</text>
+<text x="455" y="284">signed by dxil.dll</text>
+<text x="630" y="196">GPU machine code</text>
+</g>
+<g stroke="#8a8a84" stroke-width="1.5" fill="none" marker-end="url(#a)">
+<line x1="150" y1="170" x2="198" y2="100"/>
+<line x1="150" y1="190" x2="198" y2="262"/>
+<line x1="340" y1="92" x2="388" y2="92"/>
+<line x1="340" y1="268" x2="388" y2="268"/>
+<path d="M520 92 L545 92 L545 168 L568 168"/>
+<path d="M520 268 L545 268 L545 192 L568 192"/>
+</g>
+<text x="360" y="338" text-anchor="middle" fill="#8a8a84" font-size="14">the compiler produces bytecode; the driver produces the final GPU code</text>
+</svg>

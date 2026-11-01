@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Georgia, serif">
+  <rect width="720" height="360" fill="#0b0b0b"/>
+  <text x="360" y="40" font-size="16" fill="#d9c591" text-anchor="middle">Shadow time in the frames of one cascade move</text>
+  <g font-size="14" fill="#c8c8c8">
+    <text x="40" y="82">Before: the cascade is redrawn whole</text>
+    <text x="40" y="232">After: drawn in slices, one slice a frame</text>
+  </g>
+  <line x1="40" y1="170" x2="680" y2="170" stroke="#8a8a84" stroke-width="1.5"/>
+  <line x1="40" y1="316" x2="680" y2="316" stroke="#8a8a84" stroke-width="1.5"/>
+  <g fill="#c8c8c8">
+    <rect x="248" y="98" width="40" height="72"/>
+  </g>
+  <g fill="#d9c591">
+    <rect x="120" y="304" width="40" height="12"/>
+    <rect x="200" y="304" width="40" height="12"/>
+    <rect x="280" y="304" width="40" height="12"/>
+    <rect x="360" y="304" width="40" height="12"/>
+    <rect x="440" y="304" width="40" height="12"/>
+    <rect x="520" y="304" width="40" height="12"/>
+  </g>
+  <g font-size="14" fill="#8a8a84" text-anchor="middle">
+    <text x="268" y="190">one frame, about 2.4 ms</text>
+    <text x="340" y="342">slices of about 0.4 ms, at most 6 frames; a depth copy on the last</text>
+  </g>
+</svg>

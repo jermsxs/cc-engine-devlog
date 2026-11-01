@@ -1,7 +1,7 @@
 ---
 title: The engine after five months
 date: 2026-10-28
-order: 1
+order: 4
 summary: A review of where the engine stands, what the main systems are, the working methods that held up, and what is still missing before the first demo.
 tags: retrospective
 cover: /images/2026-10-28-five-months-in/night-path-start.jpg
